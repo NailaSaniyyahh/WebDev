@@ -2,11 +2,11 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { User, Mail, Lock } from 'lucide-react'
 import { motion } from 'framer-motion'
-import Input from '../components/Input'
-import PasswordStrengthMeter from '../components/PasswordStrengthMeter'
+import Input from '../../components/Input'
+import PasswordStrengthMeter from '../../components/PasswordStrengthMeter'
 
 
-const SignUpPage = () => {
+const SignUp = () => {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
@@ -76,4 +76,4 @@ const SignUpPage = () => {
 	);
 }
 
-export default SignUpPage
+export default SignUp

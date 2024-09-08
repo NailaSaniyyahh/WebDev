@@ -1,21 +1,22 @@
-
-import { BarChart3, UserCircle, Boxes, Package, Receipt, Settings, LifeBuoy, LayoutDashboard} from "lucide-react"
-import { Sidebar, SidebarItem } from "./components/Sidebar.jsx" 
+import SidebarPage from "./pages/SidebarPage";
 
 function App() {
   return (
-    <main className="App">
-    <Sidebar>
-      <SidebarItem icon={<LayoutDashboard size={20} />} text="Dashboard" alert />
-      <SidebarItem icon={<BarChart3 size={20} />} text="Dashboard" />
-      <SidebarItem icon={<UserCircle size={20} />} text="Users" />
-      <SidebarItem icon={<Boxes size={20} />} text="Products" />
-      <SidebarItem icon={<Package size={20} />} text="Orders" />
-      <SidebarItem icon={<Receipt size={20} />} text="Invoices" />
-      <SidebarItem icon={<Settings size={20} />} text="Settings" />
-      <SidebarItem icon={<LifeBuoy size={20} />} text="Help" />
-    </Sidebar>
+    <main className="flex h-screen">
+
+      {/* Sidebar */}
+      <SidebarPage />
+
+       {/* Main Content Area */}
+       <section className="flex-1 p-8">
+        <h1 className="text-3xl font-bold">Main Content Area</h1>
+        <p>
+          This is the main content area beside the sidebar. You can place any content here, such as tables, forms, or other elements.
+        </p>
+        {/* Add more content here */}
+      </section>
     </main>
-  )
+  );
 }
-export default App
+
+export default App;
