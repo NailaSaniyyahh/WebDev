@@ -1,5 +1,6 @@
 import { MoreVertical, ChevronLast, ChevronFirst } from "lucide-react";
 import { useContext, createContext, useState } from "react";
+import { Link } from "react-router-dom";
 
 const SidebarContext = createContext();
 
@@ -53,9 +54,9 @@ export function Sidebar({ children }) {
   );
 }
 
-export function SidebarItem({ icon, text, active, alert, subItems }) {
+export function SidebarItem({ icon, text, active, alert, subItems, linkTo}) {
   const { expanded } = useContext(SidebarContext);
-   const [isOpen, setIsOpen] = useState(false); // Toggle for sub-items
+   const [isOpen, setIsOpen] = useState(true); // Toggle for sub-items
 
   return (
     <>
@@ -69,17 +70,20 @@ export function SidebarItem({ icon, text, active, alert, subItems }) {
               ? "bg-gradient-to-tr from-indigo-200 to-indigo-100 text-indigo-800"
               : "hover:bg-indigo-50 text-gray-600"
           }
-      `}
-         onClick={() => setIsOpen(!isOpen)} // Toggle sub-items visibility
+        `}
+        onClick={() => setIsOpen(!isOpen)} // Toggle sub-items visibility
       >
-        {icon}
-        <span
-          className={`overflow-hidden transition-all ${
-            expanded ? "w-52 ml-3" : "w-0"
-          }`}
-        >
-          {text}
-        </span>
+        {/* Use Link from react-router-dom */}
+        <Link to={linkTo || "#"} className="flex items-center w-full">
+          {icon}
+          <span
+            className={`overflow-hidden transition-all ${
+              expanded ? "w-52 ml-3" : "w-0"
+            }`}
+          >
+            {text}
+          </span>
+        </Link>
         {alert && (
           <div
             className={`absolute right-2 w-2 h-2 rounded bg-indigo-400 ${
@@ -91,11 +95,11 @@ export function SidebarItem({ icon, text, active, alert, subItems }) {
         {!expanded && (
           <div
             className={`
-            absolute left-full rounded-md px-2 py-1 ml-6
-            bg-indigo-100 text-indigo-800 text-sm
-            invisible opacity-20 -translate-x-3 transition-all
-            group-hover:visible group-hover:opacity-100 group-hover:translate-x-0
-        `}
+              absolute left-full rounded-md px-2 py-1 ml-6
+              bg-indigo-100 text-indigo-800 text-sm
+              invisible opacity-20 -translate-x-3 transition-all
+              group-hover:visible group-hover:opacity-100 group-hover:translate-x-0
+            `}
           >
             {text}
           </div>
@@ -110,9 +114,12 @@ export function SidebarItem({ icon, text, active, alert, subItems }) {
               key={index}
               className="flex items-center py-1 px-2 my-1 text-gray-600 hover:text-indigo-800 hover:bg-indigo-50 rounded-md cursor-pointer transition-colors"
             >
-              <span className={`${expanded ? "ml-3" : "ml-0"}`}>
-                {subItem.text}
-              </span>
+              {/* Link for sub-items */}
+              <Link to={subItem.linkTo || "#"} className="w-full">
+                <span className={`${expanded ? "ml-3" : "ml-0"}`}>
+                  {subItem.text}
+                </span>
+              </Link>
             </li>
           ))}
         </ul>
