@@ -1,0 +1,27 @@
+GET http://localhost:5000/users
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsIm5hbWUiOiJGYXJyZWwgS2VpemEiLCJlbWFpbCI6ImZhcnJlbEBnbWFpbC5jb20iLCJpYXQiOjE3MjUyNjEyMDcsImV4cCI6MTcyNTI2MTIyMn0.DHigIDE5u8qVU6TRsUsqecWhZs1Qn1S109pobuVmj1Q
+### 
+POST http://localhost:5000/users
+Content-Type: application/json
+
+{
+    "name": "Farrel Keiza",
+    "email": "farrel@gmail.com",
+    "password": "123456",
+    "confPassword": "123456"
+}
+
+###
+POST http://localhost:5000/login
+Content-Type: application/json
+
+{
+    "email": "farrel@gmail.com",
+    "password": "123456"
+}
+
+###
+GET http://localhost:5000/token
+
+###
+DELETE  http://localhost:5000/logout
