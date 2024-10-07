@@ -1,24 +1,37 @@
 import express from "express";
-import dotenv from "dotenv"
-import cookieParser from "cookie-parser";
+import dotenv from "dotenv";
 import cors from "cors";
-import db from "./config/Database.js";
-// import Users from "./models/UserModel.js";
-import router from  "./routes/index.js"
+import cookieParser from "cookie-parser";
+import path from "path";
+
+import { connectDB } from "./db/connectDB.js"; // Sequelize connection setup
+import authRoutes from "./routes/auth.route.js"; // Existing routes
+
 dotenv.config();
 
 const app = express();
-try {
-        await db.authenticate();
-        console.log('Database connected...');
-        //await Users.sync();
+const PORT = process.env.PORT || 5000;
+const __dirname = path.resolve();
+
+app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+app.use(express.json()); // Parse incoming requests:req.body
+app.use(cookieParser()); // Parse incoming cookies
+
+app.use("/api/auth", authRoutes);
+
+if (process.env.NODE_ENV === "production") {
+    app.use(express.static(path.join(__dirname, "/frontend/dist")));
+
+    app.get("*", (req, res) => {
+        res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
+    });
+}
+
+app.listen(PORT, async () => {
+    try {
+        await connectDB(); // Connect to MySQL via Sequelize
+        console.log(`Server is running on port: ${PORT}`);
     } catch (error) {
-        console.error('Unable to connect to the database:', error);
+        console.log("Error connecting to the database: ", error);
     }
-
-app.use(cors({ credentials: true, origin: 'http://localhost:3009'}));
-app.use(cookieParser());
-app.use(express.json());
-app.use(router);
-
-app.listen(5000, ()=> console.log('Server running at port 5000'))
+});
