@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { useAuthStore } from "../../store/authStore";
-import Input from "../../components/Input";
+import Input from "../../components/auth/Input";
 import { ArrowLeft, Loader, Mail } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -69,7 +69,7 @@ const ForgotPasswordPage = () => {
 			</div>
 
 			<div className='px-8 py-4 bg-gray-900 bg-opacity-50 flex justify-center'>
-				<Link to={"/login"} className='text-sm text-white hover:underline flex items-center'>
+				<Link to={"/auth/login"} className='text-sm text-white hover:underline flex items-center'>
 					<ArrowLeft className='h-4 w-4 mr-2' /> Back to Login
 				</Link>
 			</div>

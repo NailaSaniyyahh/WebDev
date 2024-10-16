@@ -1,9 +1,9 @@
 import { motion } from "framer-motion";
-import Input from "../../components/Input";
+import Input from "../../components/auth/Input";
 import { Loader, Lock, Mail, User } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import PasswordStrengthMeter from "../../components/PasswordStrengthMeter";
+import PasswordStrengthMeter from "../../components/auth/PasswordStrengthMeter";
 import { useAuthStore } from "../../store/authStore";
 
 const SignUpPage = () => {
@@ -19,7 +19,7 @@ const SignUpPage = () => {
 
 		try {
 			await signup(email, password, name);
-			navigate("/verify-email");
+			navigate("/auth/verify-email");
 		} catch (error) {
 			console.log(error);
 		}
@@ -79,7 +79,7 @@ const SignUpPage = () => {
 			<div className='px-8 py-4 bg-gray-900 bg-opacity-50 flex justify-center'>
 				<p className='text-sm text-gray-400'>
 					Already have an account?{" "}
-					<Link to={"/login"} className='text-white hover:underline'>
+					<Link to={"/auth/login"} className='text-white hover:underline'>
 						Login
 					</Link>
 				</p>

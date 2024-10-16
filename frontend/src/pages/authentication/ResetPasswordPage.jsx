@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { useAuthStore } from "../../store/authStore";
 import { useNavigate, useParams } from "react-router-dom";
-import Input from "../../components/Input";
+import Input from "../../components/auth/Input";
 import { Lock } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -26,7 +26,7 @@ const ResetPasswordPage = () => {
 
 			toast.success("Password reset successfully, redirecting to login page...");
 			setTimeout(() => {
-				navigate("/login");
+				navigate("/auth/login");
 			}, 2000);
 		} catch (error) {
 			console.error(error);
