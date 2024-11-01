@@ -96,11 +96,24 @@
 .card-list .card .content button:hover {
     background-color: #d40813;
 }
+
 .see-more {
-  text-align: right;
-  margin-top: 7px;
-  margin-right: 15px;
+  text-align: right; /* Mengatur teks ke sebelah kanan */
+  margin-top: 7px; /* Margin atas */
+  margin-right: 15px; /* Margin kanan */
 }
+
+.see-more .see-more-button {
+  background-color: #f00; /* Warna latar belakang merah */
+  color: white; /* Warna teks putih */
+  padding: 0.5rem 1rem; /* Padding vertikal dan horizontal */
+  border-radius: 9999px; /* Sudut bulat penuh */
+  text-align: center; /* Teks di tengah */
+  display: inline-block; /* Menjadikan tombol sebagai elemen blok inline */
+  text-decoration: none; /* Menghapus garis bawah */
+  font-size: 0.875rem; /* Ukuran font */
+}
+
 
 .see-more-link {
   text-decoration: none;

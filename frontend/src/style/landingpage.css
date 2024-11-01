@@ -359,7 +359,7 @@ input:focus{
 }
 
 .myDP{
-    height: 1050vh;
+    height: -vh;
     background: black;
     background-size: cover;
     padding-top: 100px;

@@ -41,6 +41,11 @@ const User = sequelize.define(
       type: DataTypes.DATE,
       allowNull: true, // Optional field
     },
+    role: {
+      type: DataTypes.ENUM('Admin', 'User'), // Define role as ENUM with Admin and User values
+      allowNull: true,
+      defaultValue: null, // Default role is User
+    },
   },
   {
     timestamps: true, // Automatically adds createdAt and updatedAt fields

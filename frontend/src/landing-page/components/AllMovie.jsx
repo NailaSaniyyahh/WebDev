@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import { useLocation,Link } from 'react-router-dom';
 import Footer from "./footer/Footer.jsx"; 
+import NavigationBar from "./NavigationBar.jsx";
 
 const AllMovie = () => {
   const [movies, setMovies] = useState([]);
@@ -43,6 +44,8 @@ const AllMovie = () => {
   }, [category]); // Tambahkan category ke dalam dependensi effect
 
   return (
+    <>
+    <NavigationBar/>
     <div className="mySearch bg-black">
       <Container className="p-5 mt-5">
         <h1 className="mb-3" style={{ fontWeight: 'bold', color: 'white', textDecoration: 'underline' }}>
@@ -73,6 +76,7 @@ const AllMovie = () => {
         <Footer />
       </Container>
     </div>
+    </>
   );
 };
 

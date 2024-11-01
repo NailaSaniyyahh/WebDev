@@ -3,11 +3,13 @@ import { Container, Row, Col, Form, Button } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
 import AllActor from './AllActor'; 
 import Footer from "./footer/Footer.jsx";
+import NavigationBar from './NavigationBar.jsx';
 
 const DetailPage = () => {
     const { id } = useParams();
     const [movie, setMovie] = useState(null);
     const [comments, setComments] = useState([]); 
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [newComment, setNewComment] = useState({
         user: '',
         rating: 1,
@@ -19,26 +21,60 @@ const DetailPage = () => {
         setNewComment({ ...newComment, [name]: value });
     };
     
-    const handleCommentSubmit = (e) => {
+    const handleCommentSubmit = async (e) => {
         e.preventDefault();
     
-        const newReview = {
+        const reviewData = {
+            movieId: id,
             user: newComment.user,
             rating: newComment.rating,
             text: newComment.text,
-            date: new Date().toLocaleDateString()
         };
     
-        // Simpan review di state lokal
-        setComments([...comments, newReview]);
-        
-        // Reset form setelah submit
-        setNewComment({
-            user: '',
-            rating: 1,
-            text: ''
-        });
+        try {
+            const response = await fetch(`http://localhost:5000/reviews/add`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(reviewData),
+            });
+    
+            if (response.ok) {
+                alert('Review added successfully');
+                const newReview = await response.json();
+                setComments([...comments, newReview]);
+                setNewComment({ user: '', rating: 1, text: '' });
+            } else {
+                const errorData = await response.json(); // Cetak pesan error dari server
+                console.error('Failed to add review:', errorData);
+                alert(`Failed to add review: ${errorData.error || 'Unknown error'}`);
+            }
+        } catch (error) {
+            console.error('Error adding review:', error);
+            alert('Error adding review');
+        }
     };    
+
+    useEffect(() => {
+        const checkAuth = async () => {
+            try {
+                const response = await fetch("http://localhost:5000/api/auth/check-auth", {
+                    credentials: "include", // Untuk mengirim cookie
+                });
+                const data = await response.json();
+                if (data.success) {
+                    setIsLoggedIn(true);
+                } else {
+                    setIsLoggedIn(false);
+                }
+            } catch (error) {
+                console.error("Error checking auth:", error);
+                setIsLoggedIn(false);
+            }
+        };
+    
+        checkAuth();
+    }, []);
+
 
     useEffect(() => {
         // Ambil data film dari landing
@@ -62,6 +98,8 @@ const DetailPage = () => {
     }
 
     return (
+        <>
+        <NavigationBar />
         <div className="myDP">
             <Container className="text-white">
                 <Row className="d-flex flex-wrap align-items-start">
@@ -153,58 +191,63 @@ const DetailPage = () => {
                 </Row>
 
                 {/* Tambah Review */}
-                <Row className="mb-4 mt-4">
-                    <Col md={12}>
-                        <div className="bg-dark text-white p-3 mb-4">
-                            <h4 className='mb-4'>Add Your Review!</h4>
-                            <Form onSubmit={handleCommentSubmit}>
-                                <Form.Group className="mb-3" controlId="formBasicName">
-                                    <Form.Label>Name</Form.Label>
-                                    <Form.Control 
-                                        type="text" 
-                                        placeholder="Enter Your Name" 
-                                        name="user"
-                                        value={newComment.user}
-                                        onChange={handleInputChange} 
-                                    />
-                                </Form.Group>
+                {isLoggedIn ? (
+                    <Row className="mb-4 mt-4">
+                        <Col md={12}>
+                            <div className="bg-dark text-white p-3 mb-4">
+                                <h4 className='mb-4'>Add Your Review!</h4>
+                                <Form onSubmit={handleCommentSubmit}>
+                                    <Form.Group className="mb-3" controlId="formBasicName">
+                                        <Form.Label>Name</Form.Label>
+                                        <Form.Control 
+                                            type="text" 
+                                            placeholder="Enter Your Name" 
+                                            name="user"
+                                            value={newComment.user}
+                                            onChange={handleInputChange} 
+                                        />
+                                    </Form.Group>
 
-                                <Form.Group className="mb-3" controlId="formBasicRating">
-                                    <Form.Label>Rating</Form.Label>
-                                    <Form.Control 
-                                        as="select"
-                                        name="rating"
-                                        value={newComment.rating}
-                                        onChange={handleInputChange}>
-                                        {[1, 2, 3, 4, 5].map(star => (
-                                            <option key={star} value={star}>{star} Star</option>
-                                        ))} 
-                                    </Form.Control>
-                                </Form.Group>
+                                    <Form.Group className="mb-3" controlId="formBasicRating">
+                                        <Form.Label>Rating</Form.Label>
+                                        <Form.Control 
+                                            as="select"
+                                            name="rating"
+                                            value={newComment.rating}
+                                            onChange={handleInputChange}>
+                                            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(star => (
+                                                <option key={star} value={star}>{star} Star</option>
+                                            ))} 
+                                        </Form.Control>
+                                    </Form.Group>
 
-                                <Form.Group className="mb-3" controlId="formBasicThoughts">
-                                    <Form.Label>Your Review</Form.Label>
-                                    <Form.Control 
-                                        as="textarea" 
-                                        rows={3} 
-                                        name="text"
-                                        value={newComment.text}
-                                        onChange={handleInputChange} 
-                                    />
-                                </Form.Group>
+                                    <Form.Group className="mb-3" controlId="formBasicThoughts">
+                                        <Form.Label>Your Review</Form.Label>
+                                        <Form.Control 
+                                            as="textarea" 
+                                            rows={3} 
+                                            name="text"
+                                            value={newComment.text}
+                                            onChange={handleInputChange} 
+                                        />
+                                    </Form.Group>
 
-                                <Button variant="warning" type="submit">
-                                    Submit
-                                </Button>
-                            </Form>
-                        </div>
-                    </Col>
-                </Row>
+                                    <Button variant="warning" type="submit">
+                                        Submit
+                                    </Button>
+                                </Form>
+                            </div>
+                        </Col>
+                    </Row>
+                ) : (
+                    <p style={{ fontWeight: 'bold', fontSize: '36px', textAlign: 'center' }} className='mt-4'>Please log in to add a review.</p>
+                )}
 
                 <Footer/>
             </Container>
             
         </div>
+        </>
     );
 };
 

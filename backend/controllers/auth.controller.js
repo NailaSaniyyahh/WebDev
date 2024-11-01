@@ -34,14 +34,16 @@ export const signup = async (req, res) => {
 			email,
 			password: hashedPassword,
 			name,
+			role: 'User',
 			verificationToken,
 			verificationTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
 		});
 
 		// jwt
 		generateTokenAndSetCookie(res, user.id);
-
+		console.log('halo human1')
 		await sendVerificationEmail(user.email, verificationToken);
+		console.log('halo human')
 
 		res.status(201).json({
 			success: true,

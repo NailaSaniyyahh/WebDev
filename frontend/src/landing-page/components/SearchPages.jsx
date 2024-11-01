@@ -1,9 +1,10 @@
 import { Dropdown, Form, Row, Col, Image } from 'react-bootstrap';
-import 'bootstrap/dist/css/bootstrap.min.css';
+// import 'bootstrap/dist/css/bootstrap.min.css';
 import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from 'react';
 import Footer from "./footer/Footer";
 import "../../style/searchPage.css";
+import NavigationBar from './NavigationBar';
 
 const SearchPages = () => {
   const location = useLocation(); 
@@ -34,12 +35,24 @@ const SearchPages = () => {
 
     fetch('http://localhost:5000/landing/movies/years')
       .then(res => res.json())
-      .then(data => setYears(data))
+      .then(data => {
+        // Mengambil tahun dari objek yang diterima
+        const yearList = data.map(item => item.year);
+        setYears(yearList);
+        console.log('Years fetched:', yearList); // Log tahun yang diambil
+      })
       .catch(err => console.error('Failed to fetch years:', err));
 
     fetch('http://localhost:5000/landing/movies/statuses')
       .then(res => res.json())
-      .then(data => setStatuses(data))
+      .then(data => {
+        if (Array.isArray(data)) {
+          setStatuses(data); // Langsung set statuses jika data adalah array
+          console.log('Statuses fetched:', data); // Tambahkan log untuk memeriksa data
+        } else {
+          console.error('Expected an array but got:', data);
+        }
+      })
       .catch(err => console.error('Failed to fetch statuses:', err));
   }, []);
 
@@ -86,6 +99,8 @@ const SearchPages = () => {
   const limitedMovies = Array.isArray(movies) ? movies.slice(0, 100) : [];
 
   return (
+  <>
+  <NavigationBar/>
     <section className="trending p-40 mySearch" style={{ paddingTop: '120px' }}>
       <div className="container-fluid">
         <Row>
@@ -139,6 +154,7 @@ const SearchPages = () => {
                     </Dropdown>
                   </li>
 
+                  {/* Filter Year */}
                   {/* Filter Year */}
                   <li>
                     <Dropdown>
@@ -205,6 +221,7 @@ const SearchPages = () => {
         <Footer />
       </div>
     </section>
+  </>
   );
 }
 

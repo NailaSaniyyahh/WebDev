@@ -5,56 +5,57 @@ import cookieParser from "cookie-parser";
 import path from "path";
 
 import { connectDB } from "./db/connectDB.js"; // Sequelize connection setup
-import authRoutes from "./routes/auth.route.js";
-import movieRoutes from "./routes/movieRoutes.js";
-import genreRoute from "./routes/genreRoute.js";
-import countryRoute from "./routes/countryRoute.js";
-import actorRoute from "./routes/actorRoute.js";
-import reviewRoute from "./routes/reviewRoute.js";
+import authRoutes from "./routes/auth.route.js"; // Auth routes
+import countryRoutes from "./routes/countries.route.js"; // Country routes (new)
+import genreRoutes from "./routes/genres.route.js";
+import actorRoutes from "./routes/actors.route.js"; // Import actors route
 
-// Initialize environment variables
-dotenv.config();
+import movieRoutes from "./routes/landing-page/movieRoutes.js";
+import genreRoute from "./routes/landing-page/genreRoute.js";
+import countryRoute from "./routes/landing-page/countryRoute.js";
+import actorRoute from "./routes/landing-page/actorRoute.js";
+import reviewRoute from "./routes/landing-page/reviewRoute.js";
+
+dotenv.config( {path: '../.env' });
+
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 const __dirname = path.resolve();
 
-// Middleware
-app.use(cors({ origin: "http://localhost:5173", credentials: true }));
-app.use(express.json()); // Parse incoming JSON requests
-app.use(cookieParser()); // Parse cookies
+app.use(cors({ origin: "http://localhost:5173", credentials: true })); // Enable CORS
+app.use(express.json()); // Parse incoming requests:req.body
+app.use(cookieParser()); // Parse incoming cookies
 
-// API Routes
-app.use("/api/auth", authRoutes);
+// Routes
+app.use("/api/auth", authRoutes); // Existing auth routes
+app.use("/api", countryRoutes); // Country routes (new)
+app.use("/api", genreRoutes); // Genre routes (new)
+app.use("/api", actorRoutes); // Actors routes
+
+// Route landing-page
 app.use("/landing", movieRoutes);
 app.use("/genres", genreRoute);
 app.use("/countries", countryRoute);
 app.use("/actors", actorRoute);
 app.use("/reviews", reviewRoute);
 
-// Serve frontend files in production
+// Serve frontend in production
 if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "/frontend/dist")));
+    app.use(express.static(path.join(__dirname, "/frontend/dist")));
 
-  app.get("*", (req, res) => {
-    res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
-  });
+    app.get("*", (req, res) => {
+        res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
+    });
 }
 
 // Start the server and connect to the database
-const startServer = async () => {
-  try {
-    await connectDB(); // Connect to MySQL via Sequelize
-    console.log("Database connected successfully");
+app.listen(PORT, async () => {
+    try {
+        await connectDB(); // Connect to MySQL via Sequelize
+        console.log(`Server is running on port: ${PORT}`);
+    } catch (error) {
+        console.log("Error connecting to the database: ", error);
+    }
+});
 
-    app.listen(PORT, () => {
-      console.log(`Server is running on port: ${PORT}`);
-    });
-  } catch (error) {
-    console.error("Error connecting to the database:", error);
-    process.exit(1); // Exit the process if the database fails to connect
-  }
-};
-
-// Start the server
-startServer();
