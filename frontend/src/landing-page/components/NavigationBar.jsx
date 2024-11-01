@@ -4,6 +4,7 @@ import { FaSearch, FaBell } from "react-icons/fa"; // Import necessary icons
 import logo from "../../assets/logofixx.png";
 import { useNavigate } from "react-router-dom";
 import DropDownProfile from "./DropDownProfile";
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const NavigationBar = () => {
   const [isSticky, setSticky] = useState(false);

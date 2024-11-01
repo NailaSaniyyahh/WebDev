@@ -8,6 +8,7 @@ import { FaArrowLeft, FaArrowRight, FaPlay } from "react-icons/fa";
 import MovieCard from "./MovieCard";
 import Footer from "./footer/Footer.jsx";
 import NavigationBar from "./NavigationBar.jsx";
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const HomePage = () => {
   const [videoUrl, setVideoUrl] = useState("");

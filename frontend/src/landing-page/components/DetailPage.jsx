@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom';
 import AllActor from './AllActor'; 
 import Footer from "./footer/Footer.jsx";
 import NavigationBar from './NavigationBar.jsx';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const DetailPage = () => {
     const { id } = useParams();

@@ -4,6 +4,7 @@ import { Container } from 'react-bootstrap';
 import "slick-carousel/slick/slick.css"; 
 import "slick-carousel/slick/slick-theme.css";
 import { NextArrow, PrevArrow } from './CustomArrows';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const AllActor = ({ actors = [] }) => { // Default value untuk actors adalah array kosong
   if (!actors.length) {

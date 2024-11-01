@@ -3,6 +3,7 @@ import { Container, Row, Col } from "react-bootstrap";
 import { useLocation,Link } from 'react-router-dom';
 import Footer from "./footer/Footer.jsx"; 
 import NavigationBar from "./NavigationBar.jsx";
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const AllMovie = () => {
   const [movies, setMovies] = useState([]);

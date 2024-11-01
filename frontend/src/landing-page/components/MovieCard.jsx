@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link } from 'react-router-dom';
 import "../../style/MovieCard.css";
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const MovieCard = ({ title, movies = [] }) => {  
   const cardsRef = useRef();

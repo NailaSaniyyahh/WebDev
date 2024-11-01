@@ -13,6 +13,7 @@ import IMG6 from "../../assets/morbius.jpg";
 import IMG7 from "../../assets/img-1.png";
 import Slider from "react-slick";
 import NavigationBar from "./NavigationBar";
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const Intro = () => {
   const settings = {

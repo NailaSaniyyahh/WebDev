@@ -2,6 +2,7 @@ import React from "react";
 import { Dropdown } from 'react-bootstrap';
 import { FaUserCircle } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const DropDownProfile = () => {
   return (

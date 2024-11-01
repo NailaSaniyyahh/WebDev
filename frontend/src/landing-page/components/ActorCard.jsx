@@ -1,5 +1,6 @@
 import { Card, Col } from "react-bootstrap";
 import "../../style/ActorCard.css";
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const ActorCard = ({ image, name }) => {
     return (

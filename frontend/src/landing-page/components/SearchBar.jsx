@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CardData from './CardData';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const SearchBar = () => {
   const [searchQuery, setSearchQuery] = useState('');

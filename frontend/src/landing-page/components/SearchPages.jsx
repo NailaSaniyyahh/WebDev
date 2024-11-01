@@ -1,5 +1,5 @@
 import { Dropdown, Form, Row, Col, Image } from 'react-bootstrap';
-// import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from 'react';
 import Footer from "./footer/Footer";

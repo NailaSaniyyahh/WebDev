@@ -5,6 +5,7 @@ import { faFilter, faStar } from '@fortawesome/free-solid-svg-icons';
 import { Link, useLocation } from "react-router-dom";
 import IMG7 from "../../assets/img-1.png";
 import { useState } from 'react';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const GenrePage = () => {
   const location = useLocation();
