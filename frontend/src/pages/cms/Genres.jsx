@@ -10,18 +10,20 @@ const Genres = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 25;
 
+  // Fungsi untuk mengambil daftar genre
+  const fetchGenres = async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/api/genres", {
+        params: { limit: 1000 },
+      });
+      setAllGenres(response.data.genres || []);
+      setFilteredGenres(response.data.genres || []);
+    } catch (error) {
+      console.error("Error fetching genres:", error);
+    }
+  };
+
   useEffect(() => {
-    const fetchGenres = async () => {
-      try {
-        const response = await axios.get("http://localhost:5000/api/genres", {
-          params: { limit: 1000 },
-        });
-        setAllGenres(response.data.genres || []);
-        setFilteredGenres(response.data.genres || []);
-      } catch (error) {
-        console.error("Error fetching genres:", error);
-      }
-    };
     fetchGenres();
   }, []);
 
@@ -43,9 +45,11 @@ const Genres = () => {
       const response = await axios.post("http://localhost:5000/api/genres", {
         name: genreName,
       });
-      setAllGenres([...allGenres, response.data.genre]);
-      setGenreName("");
       alert("Genre added successfully!");
+      setGenreName("");
+
+      // Memanggil ulang fetchGenres setelah berhasil menambahkan genre
+      fetchGenres();
     } catch (error) {
       console.error("Error adding genre:", error);
       alert("Failed to add genre.");
@@ -79,6 +83,10 @@ const Genres = () => {
   };
 
   const handleDelete = async (id) => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this genre?");
+  
+    if (!confirmDelete) return;
+
     try {
       await axios.delete(`http://localhost:5000/api/genres/${id}`);
       setAllGenres(allGenres.filter((genre) => genre.id !== id));
@@ -88,7 +96,7 @@ const Genres = () => {
       alert("Failed to delete genre.");
     }
   };
-
+  
   const indexOfLastGenre = currentPage * itemsPerPage;
   const indexOfFirstGenre = indexOfLastGenre - itemsPerPage;
   const currentGenres = filteredGenres.slice(
@@ -123,7 +131,7 @@ const Genres = () => {
                 placeholder="Enter genre name"
                 value={genreName}
                 onChange={(e) => setGenreName(e.target.value)}
-                className="tw-bg-indigo-100/30 tw-px-4 tw-py-2 tw-rounded-lg focus:tw-outline-0 focus:tw-ring-2 focus:tw-ring-gray-300"
+                className="tw-bg-indigo-100/30 tw-px-4 tw-py-2 tw-rounded-lg tw-border focus:tw-outline-0 focus:tw-ring-2 focus:tw-ring-gray-300"
               />
               <button
                 type="submit"

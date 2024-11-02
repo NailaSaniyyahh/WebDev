@@ -41,6 +41,7 @@ export const getGenres = async (req, res) => {
     const genres = await Genre.findAll({
       limit: parseInt(limit),
       offset: parseInt(offset),
+      order: [['name', 'ASC']], // Mengurutkan berdasarkan kolom 'name' secara ascending
     });
     res.status(200).json({ genres });
   } catch (error) {
@@ -48,6 +49,7 @@ export const getGenres = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
 
 // DELETE /api/genres/:id
 export const deleteGenre = async (req, res) => {

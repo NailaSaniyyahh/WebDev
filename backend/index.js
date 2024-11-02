@@ -3,38 +3,46 @@ import dotenv from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import path from "path";
+import { fileURLToPath } from "url";
 
-import { connectDB } from "./db/connectDB.js"; // Sequelize connection setup
-import authRoutes from "./routes/auth.route.js"; // Auth routes
-import countryRoutes from "./routes/countries.route.js"; // Country routes (new)
+import { connectDB } from "./db/connectDB.js";
+import authRoutes from "./routes/auth.route.js";
+import countryRoutes from "./routes/countries.route.js";
 import genreRoutes from "./routes/genres.route.js";
-import actorRoutes from "./routes/actors.route.js"; // Import actors route
-
-import movieRoutes from "./routes/landing-page/movieRoutes.js";
+import actorRoutes from "./routes/actors.route.js";
+import movieRoutes from "./routes/movies.route.js"; // Import movie routes
 import genreRoute from "./routes/landing-page/genreRoute.js";
 import countryRoute from "./routes/landing-page/countryRoute.js";
 import actorRoute from "./routes/landing-page/actorRoute.js";
 import reviewRoute from "./routes/landing-page/reviewRoute.js";
 
-dotenv.config( {path: '../.env' });
+// Menentukan __dirname secara manual
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
+// Menggunakan dotenv dengan path yang benar
+dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const __dirname = path.resolve();
 
-app.use(cors({ origin: "http://localhost:5173", credentials: true })); // Enable CORS
-app.use(express.json()); // Parse incoming requests:req.body
-app.use(cookieParser()); // Parse incoming cookies
+// Middleware
+app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
+app.use(express.json());
+app.use(cookieParser());
+
+// Serve uploaded files statically
+app.use("/uploads", express.static(path.join(__dirname, "./uploads")));
 
 // Routes
-app.use("/api/auth", authRoutes); // Existing auth routes
-app.use("/api", countryRoutes); // Country routes (new)
-app.use("/api", genreRoutes); // Genre routes (new)
-app.use("/api", actorRoutes); // Actors routes
+app.use("/api/auth", authRoutes);
+app.use("/api", countryRoutes);
+app.use("/api", genreRoutes);
+app.use("/api", actorRoutes);
+app.use("/api", movieRoutes); // Tambahkan movie route ke API
 
 // Route landing-page
-app.use("/landing", movieRoutes);
+app.use("/landing", movieRoutes); // Pastikan ini mengarah ke folder landing-page jika sesuai
 app.use("/genres", genreRoute);
 app.use("/countries", countryRoute);
 app.use("/actors", actorRoute);
@@ -42,20 +50,26 @@ app.use("/reviews", reviewRoute);
 
 // Serve frontend in production
 if (process.env.NODE_ENV === "production") {
-    app.use(express.static(path.join(__dirname, "/frontend/dist")));
-
+    app.use(express.static(path.join(__dirname, "../frontend/dist")));
     app.get("*", (req, res) => {
-        res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
+        res.sendFile(path.resolve(__dirname, "../frontend/dist/index.html"));
     });
 }
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+    console.error("Server Error:", err);
+    res.status(500).json({ success: false, message: "Server error" });
+});
 
 // Start the server and connect to the database
 app.listen(PORT, async () => {
     try {
-        await connectDB(); // Connect to MySQL via Sequelize
+        await connectDB();
         console.log(`Server is running on port: ${PORT}`);
     } catch (error) {
         console.log("Error connecting to the database: ", error);
     }
 });
+
 

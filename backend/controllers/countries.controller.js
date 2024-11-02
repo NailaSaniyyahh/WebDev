@@ -41,6 +41,7 @@ export const getCountries = async (req, res) => {
     const countries = await Country.findAll({
       limit: parseInt(limit),
       offset: parseInt(offset),
+      order: [['name', 'ASC']], // Mengurutkan berdasarkan kolom 'name' secara ascending
     });
     res.status(200).json({ countries });
   } catch (error) {
@@ -48,6 +49,7 @@ export const getCountries = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
 
 // DELETE /api/countries/:id
 export const deleteCountry = async (req, res) => {

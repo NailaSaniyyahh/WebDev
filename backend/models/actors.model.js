@@ -11,7 +11,7 @@ const Actor = sequelize.define(
     },
     name: {
       type: DataTypes.STRING(255),
-      allowNull: true,
+      allowNull: false,
     },
     profile_path: {
       type: DataTypes.STRING(255),

@@ -10,22 +10,23 @@ const Countries = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 25;
 
-  useEffect(() => {
-    const fetchCountries = async () => {
-      try {
-        const response = await axios.get(
-          "http://localhost:5000/api/countries",
-          {
-            params: { limit: 1000 },
-          }
-        );
-        setAllCountries(response.data.countries || []);
-        setFilteredCountries(response.data.countries || []);
-      } catch (error) {
-        console.error("Error fetching countries:", error);
-      }
-    };
+  // Fungsi fetchCountries untuk mengambil data negara
+  const fetchCountries = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:5000/api/countries",
+        {
+          params: { limit: 1000 },
+        }
+      );
+      setAllCountries(response.data.countries || []);
+      setFilteredCountries(response.data.countries || []);
+    } catch (error) {
+      console.error("Error fetching countries:", error);
+    }
+  };
 
+  useEffect(() => {
     fetchCountries();
   }, []);
 
@@ -47,9 +48,11 @@ const Countries = () => {
       const response = await axios.post("http://localhost:5000/api/countries", {
         name: countryName,
       });
-      setAllCountries([...allCountries, response.data.country]);
-      setCountryName("");
       alert("Country added successfully!");
+      setCountryName("");
+
+      // Panggil fetchCountries untuk memperbarui daftar negara
+      fetchCountries();
     } catch (error) {
       console.error("Error adding country:", error);
       alert("Failed to add country.");
@@ -85,6 +88,12 @@ const Countries = () => {
   };
 
   const handleDelete = async (id) => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this country?");
+  
+    if (!confirmDelete) {
+      return;
+    }
+  
     try {
       await axios.delete(`http://localhost:5000/api/countries/${id}`);
       setAllCountries(allCountries.filter((country) => country.id !== id));
@@ -94,6 +103,7 @@ const Countries = () => {
       alert("Failed to delete country.");
     }
   };
+  
 
   const indexOfLastCountry = currentPage * itemsPerPage;
   const indexOfFirstCountry = indexOfLastCountry - itemsPerPage;
@@ -129,7 +139,7 @@ const Countries = () => {
                 placeholder="Enter country name"
                 value={countryName}
                 onChange={(e) => setCountryName(e.target.value)}
-                className="tw-bg-indigo-100/30 tw-px-4 tw-py-2 tw-rounded-lg focus:tw-outline-0 focus:tw-ring-2 focus:tw-ring-gray-300"
+                className="tw-bg-indigo-100/30 tw-border tw-px-4 tw-py-2 tw-rounded-lg focus:tw-outline-0 focus:tw-ring-2 focus:tw-ring-gray-300"
               />
               <button
                 type="submit"
