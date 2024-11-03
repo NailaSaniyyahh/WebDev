@@ -37,20 +37,31 @@ import LoadingSpinner from "./components/authentication/LoadingSpinner";
 import { useAuthStore } from "./store/authStore";
 import { useEffect } from "react";
 
-// protect routes that require authentication
+
+// protect routes that require authentication and admin role
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, user } = useAuthStore();
 
+  // Redirect to login if the user is not authenticated
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 
+  // Redirect to email verification if the user is not verified
   if (!user.isVerified) {
     return <Navigate to="/verify-email" replace />;
   }
 
+  // Redirect to home page if the user is not an Admin
+  if (user.role !== 'Admin') {
+    return <Navigate to="/" replace />;
+  }
+
+  // Render the children components if all checks pass
   return children;
 };
+
+
 
 // redirect authenticated users to the home page
 const RedirectAuthenticatedUser = ({ children }) => {
@@ -75,13 +86,12 @@ function App() {
   return (
     <>
       <Routes>
-      <Route path="/" element={<HomePage />} />
-      {/* <Route path="/" element={<Intro/>} /> */}
-      <Route path="/detail/:id" element={<DetailPage />} />
-      <Route path="/search" element={<SearchPages />} />
-      <Route path="/all-movies" element={<AllMovies />} />
+        <Route path="/" element={<HomePage />} />
+        <Route path="/detail/:id" element={<DetailPage />} />
+        <Route path="/search" element={<SearchPages />} />
+        <Route path="/all-movies" element={<AllMovies />} />
 
-
+        {/* CMS Routes - Only accessible by Admin */}
         <Route
           path="/cms"
           element={
@@ -91,7 +101,6 @@ function App() {
           }
         >
           <Route index element={<Show />} />
-          <Route path="/cms" element={<Show />} />
           <Route path="/cms/input-drama" element={<InputDrama />} />
           <Route path="/cms/countries" element={<Countries />} />
           <Route path="/cms/genres" element={<Genres />} />
@@ -100,7 +109,7 @@ function App() {
           <Route path="/cms/users" element={<Users />} />
         </Route>
 
-
+        {/* Auth Routes */}
         <Route
           path="/signup"
           element={
@@ -126,7 +135,6 @@ function App() {
             </RedirectAuthenticatedUser>
           }
         />
-
         <Route
           path="/reset-password/:token"
           element={
@@ -135,7 +143,8 @@ function App() {
             </RedirectAuthenticatedUser>
           }
         />
-        {/* catch all routes */}
+
+        {/* Catch-all route */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </>

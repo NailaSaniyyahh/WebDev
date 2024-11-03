@@ -1,5 +1,4 @@
 import React from "react";
-import { GoBell } from "react-icons/go";
 import { motion } from "framer-motion";
 import { useAuthStore } from "../../store/authStore";
 

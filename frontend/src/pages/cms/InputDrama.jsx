@@ -343,7 +343,7 @@ const InputDrama = () => {
                         <img
                           src={actor.photo}
                           alt={actor.label}
-                          className="tw-w-16 tw-h-16 tw-rounded tw-mb-2"
+                          className="tw-w-20 tw-h-24 tw-rounded tw-mb-2"
                         />
                         <span className="tw-w-full tw-text-center">
                           {actor.label}

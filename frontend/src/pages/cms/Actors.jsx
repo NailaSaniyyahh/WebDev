@@ -178,7 +178,9 @@ const Actors = () => {
               <tbody>
                 {filteredActors.length > 0 ? (
                   filteredActors.map((actor, index) => (
-                    <tr key={actor.id} className="tw-bg-red-50">
+                    <tr key={actor.id} className={
+                          index % 2 === 0 ? "tw-bg-white" : "tw-bg-gray-50"
+                        }>
                       <td className="tw-py-2 tw-px-4 tw-border-b tw-border-gray-300">
                         {index + 1}
                       </td>

@@ -6,7 +6,15 @@ import { useNavigate } from "react-router-dom";
 import DropDownProfile from "./DropDownProfile";
 import 'bootstrap/dist/css/bootstrap.min.css';
 
+import { useAuthStore } from "../../store/authStore"
+
 const NavigationBar = () => {
+  const { logout } = useAuthStore();
+
+  const handleLogout = () => {
+    logout();
+  };
+
   const [isSticky, setSticky] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -58,6 +66,8 @@ const NavigationBar = () => {
             <li><a href="/all-movies?category=upcoming">Upcoming</a></li>
           </ul>
         </Nav>
+
+        <button onClick={handleLogout}>Logout</button>
 
         <Nav className="navbar-right">
           <FaSearch className="icons" onClick={toggleSearchBar} style={{ cursor: 'pointer' }} />
