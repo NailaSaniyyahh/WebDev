@@ -1,8 +1,9 @@
-import Movie from "../models/movies.model.js";
-
 import { Op } from "sequelize";
 import fs from "fs";
 import path from "path";
+import Movie from "../models/movies.model.js";
+import Genre from "../models/genres.model.js"; // Pastikan untuk mengimpor Genre
+import Actor from "../models/actors.model.js"; // Pastikan untuk mengimpor Actor
 
 // Fungsi untuk membuat film baru
 export const createMovie = async (req, res) => {
@@ -19,6 +20,8 @@ export const createMovie = async (req, res) => {
         genres, // Array of genre IDs
         actors, // Array of actor IDs
       } = req.body;
+
+      console.log(typeof genres, typeof actors)
   
       // Jika ada file poster, simpan dengan path seperti pada addActor
       const posterPath = req.file ? `uploads/movies/${req.file.filename}` : null;
@@ -43,20 +46,28 @@ export const createMovie = async (req, res) => {
         category,
         country_id,
       });
-  
+      
+      const genresdata = JSON.parse(genres)
+
+      const actorsdata = JSON.parse(actors)
+
+      console.log(genresdata, actorsdata)
+
       // Menambahkan hubungan many-to-many ke Genre
-      if (genres && genres.length > 0) {
+      if (Array.isArray(genresdata) && genresdata.length > 0) {
         const genreInstances = await Genre.findAll({
-          where: { id: { [Op.in]: genres } },
+          where: { id: { [Op.in]: genresdata } },
         });
+        console.log("Genre instances found:", genreInstances);
         await movie.addGenres(genreInstances);
       }
   
       // Menambahkan hubungan many-to-many ke Actor
-      if (actors && actors.length > 0) {
+      if (Array.isArray(actorsdata) && actorsdata.length > 0) {
         const actorInstances = await Actor.findAll({
-          where: { id: { [Op.in]: actors } },
+          where: { id: { [Op.in]: actorsdata } },
         });
+        console.log("Actor instances found:", actorInstances);
         await movie.addActors(actorInstances);
       }
   

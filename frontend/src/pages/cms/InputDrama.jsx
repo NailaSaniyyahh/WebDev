@@ -10,6 +10,11 @@ const InputDrama = () => {
   const [countries, setCountries] = useState([]);
   const [genresOptions, setGenresOptions] = useState([]);
   const [actorsOptions, setActorsOptions] = useState([]);
+  const [title, setTitle] = useState("");
+  const [altTitle, setAltTitle] = useState("");
+  const [synopsis, setSynopsis] = useState("");
+  const [year, setYear] = useState("");
+  const [trailer, setTrailer] = useState("");
 
   useEffect(() => {
     const fetchCountries = async () => {
@@ -73,7 +78,7 @@ const InputDrama = () => {
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setUploadedImage(URL.createObjectURL(file));
+      setUploadedImage(file);
     }
   };
 
@@ -81,7 +86,7 @@ const InputDrama = () => {
     e.preventDefault();
     const file = e.dataTransfer.files[0];
     if (file) {
-      setUploadedImage(URL.createObjectURL(file));
+      setUploadedImage(file);
     }
   };
 
@@ -91,6 +96,60 @@ const InputDrama = () => {
 
   const removeImage = () => {
     setUploadedImage(null);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("alt_title", altTitle);
+    formData.append("synopsis", synopsis);
+    formData.append("year", year);
+    formData.append("trailer", trailer);
+    formData.append(
+      "country_id",
+      selectedCountry ? selectedCountry.value : null
+    );
+    formData.append("genres", JSON.stringify(selectedGenres));
+    formData.append(
+      "actors",
+      JSON.stringify(selectedActors.map((actor) => actor.value))
+    );
+
+    if (uploadedImage) {
+      formData.append("poster", uploadedImage);
+    }
+
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/movies",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      console.log("Movie created:", response.data);
+      alert("Movie created successfully!");
+
+      // Reset all fields after successful submit
+      setTitle("");
+      setAltTitle("");
+      setSynopsis("");
+      setYear("");
+      setTrailer("");
+      setSelectedCountry(null);
+      setSelectedGenres([]);
+      setSelectedActors([]);
+      setUploadedImage(null);
+
+      console.log("Form fields reset to default values.");
+    } catch (error) {
+      console.error("Error creating movie:", error);
+      alert("Failed to create movie");
+    }
   };
 
   // Custom styles for react-select
@@ -106,8 +165,8 @@ const InputDrama = () => {
     }),
     menu: (provided) => ({
       ...provided,
-      maxHeight: 200, // Tinggi maksimum dropdown
-      overflowY: "auto", // Aktifkan scrolling
+      maxHeight: 200,
+      overflowY: "auto",
     }),
   };
 
@@ -118,7 +177,7 @@ const InputDrama = () => {
           <h2 className="tw-text-2xl tw-font-bold tw-text-gray-800 tw-mb-2">
             Page Input Drama
           </h2>
-          <form>
+          <form onSubmit={handleSubmit}>
             <div className="tw-flex tw-flex-col sm:tw-flex-row tw-space-y-4 sm:tw-space-y-0 sm:tw-space-x-4">
               {/* Left Column: Submit Button and Image Upload */}
               <div className="tw-flex tw-flex-col tw-items-center">
@@ -158,7 +217,7 @@ const InputDrama = () => {
                   ) : (
                     <div className="tw-relative">
                       <img
-                        src={uploadedImage}
+                        src={URL.createObjectURL(uploadedImage)}
                         alt="Preview"
                         className="tw-w-48 tw-h-32 tw-object-cover tw-rounded-md"
                       />
@@ -173,13 +232,11 @@ const InputDrama = () => {
                   )}
                 </div>
 
-                <button>
-                  <a
-                    className="tw-inline-flex tw-items-center tw-justify-center tw-rounded-xl tw-bg-green-600 tw-py-2 tw-px-6 tw-font-dm tw-text-base tw-font-medium tw-text-white tw-shadow-xl tw-shadow-green-100/75 tw-transition-transform tw-duration-200 tw-ease-in-out hover:tw-scale-[1.02] tw-mt-2"
-                    href="#"
-                  >
-                    Submit
-                  </a>
+                <button
+                  type="submit"
+                  className="tw-inline-flex tw-items-center tw-justify-center tw-rounded-xl tw-bg-green-600 tw-py-2 tw-px-6 tw-font-dm tw-text-base tw-font-medium tw-text-white tw-shadow-xl tw-shadow-green-100/75 tw-transition-transform tw-duration-200 tw-ease-in-out hover:tw-scale-[1.02] tw-mt-2"
+                >
+                  Submit
                 </button>
               </div>
 
@@ -191,6 +248,8 @@ const InputDrama = () => {
                     <input
                       type="text"
                       placeholder="Enter title"
+                      value={title}
+                      onChange={(e) => setTitle(e.target.value)}
                       className="tw-w-full tw-border tw-border-gray-300 tw-rounded-lg tw-p-2 focus:tw-outline-0 focus:tw-ring-2 focus:tw-ring-gray-300"
                     />
                   </div>
@@ -199,6 +258,8 @@ const InputDrama = () => {
                     <input
                       type="text"
                       placeholder="Enter alternative title"
+                      value={altTitle}
+                      onChange={(e) => setAltTitle(e.target.value)}
                       className="tw-w-full tw-border tw-border-gray-300 tw-rounded-lg tw-p-2 focus:tw-outline-0 focus:tw-ring-2 focus:tw-ring-gray-300"
                     />
                   </div>
@@ -207,6 +268,8 @@ const InputDrama = () => {
                     <input
                       type="text"
                       placeholder="Enter year"
+                      value={year}
+                      onChange={(e) => setYear(e.target.value)}
                       className="tw-w-full tw-border tw-border-gray-300 tw-rounded-lg tw-p-2 focus:tw-outline-0 focus:tw-ring-2 focus:tw-ring-gray-300"
                     />
                   </div>
@@ -226,6 +289,8 @@ const InputDrama = () => {
                     <label>Synopsis</label>
                     <textarea
                       placeholder="Enter synopsis"
+                      value={synopsis}
+                      onChange={(e) => setSynopsis(e.target.value)}
                       className="tw-w-full tw-border tw-border-gray-300 tw-rounded-lg tw-p-2 focus:tw-outline-0 focus:tw-ring-2 focus:tw-ring-gray-300"
                       rows="4"
                     ></textarea>
@@ -241,12 +306,15 @@ const InputDrama = () => {
                         <input
                           type="checkbox"
                           id={`genre-${genre.id}`}
-                          value={genre.name}
-                          checked={selectedGenres.includes(genre.name)}
-                          onChange={() => handleGenreChange(genre.name)}
+                          value={genre.id}
+                          checked={selectedGenres.includes(genre.id)}
+                          onChange={() => handleGenreChange(genre.id)}
                           className="focus:tw-outline-0 focus:tw-ring-2 focus:tw-ring-gray-300"
                         />
-                        <label htmlFor={`genre-${genre.id}`} className="tw-ml-2">
+                        <label
+                          htmlFor={`genre-${genre.id}`}
+                          className="tw-ml-2"
+                        >
                           {genre.name}
                         </label>
                       </div>
@@ -265,19 +333,21 @@ const InputDrama = () => {
                     placeholder="Select Actors"
                     styles={customStyles}
                     className="tw-w-full"
-                    menuPortalTarget={document.body} // Ensure dropdown stays within viewport
-                    menuPosition="fixed"
-                    menuShouldScrollIntoView={false}
                   />
                   <div className="tw-grid tw-grid-cols-2 sm:tw-grid-cols-3 tw-gap-4 tw-mt-4">
                     {selectedActors.map((actor) => (
-                      <div key={actor.value} className="tw-relative tw-flex tw-flex-col tw-items-center">
+                      <div
+                        key={actor.value}
+                        className="tw-relative tw-flex tw-flex-col tw-items-center"
+                      >
                         <img
                           src={actor.photo}
                           alt={actor.label}
                           className="tw-w-16 tw-h-16 tw-rounded tw-mb-2"
                         />
-                        <span className="tw-w-full tw-text-center">{actor.label}</span>
+                        <span className="tw-w-full tw-text-center">
+                          {actor.label}
+                        </span>
                       </div>
                     ))}
                   </div>
@@ -289,6 +359,8 @@ const InputDrama = () => {
                   <input
                     type="text"
                     placeholder="Enter trailer link"
+                    value={trailer}
+                    onChange={(e) => setTrailer(e.target.value)}
                     className="tw-w-full tw-border tw-border-gray-300 tw-rounded-lg tw-p-2 focus:tw-outline-0 focus:tw-ring-2 focus:tw-ring-gray-300"
                   />
                 </div>
@@ -302,8 +374,3 @@ const InputDrama = () => {
 };
 
 export default InputDrama;
-
-
-
-
-

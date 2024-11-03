@@ -6,7 +6,7 @@ import Country from "./countries.model.js";
 
 // Define Movie model
 const Movie = sequelize.define(
-  "movies",
+  "Movie",
   {
     id: {
       type: DataTypes.INTEGER,
@@ -56,6 +56,7 @@ const Movie = sequelize.define(
   },
   {
     timestamps: false,
+    tableName: "movies",
   }
 );
 
@@ -69,6 +70,7 @@ Country.hasMany(Movie, {
 Movie.belongsTo(Country, {
   foreignKey: "country_id",
   as: "country",
+
 });
 
 // Movie has many Genres (many-to-many)
@@ -76,11 +78,15 @@ Movie.belongsToMany(Genre, {
   through: "movie_genres", // Intermediate table for the many-to-many relationship
   as: "genres",
   foreignKey: "movie_id",
+  otherKey: "genre_id",
+  timestamps: false,
 });
 Genre.belongsToMany(Movie, {
   through: "movie_genres",
   as: "movies",
   foreignKey: "genre_id",
+  otherKey: "movie_id",
+  timestamps: false,
 });
 
 // Movie has many Actors (many-to-many)
@@ -88,11 +94,16 @@ Movie.belongsToMany(Actor, {
   through: "movie_actors", // Intermediate table for the many-to-many relationship
   as: "actors",
   foreignKey: "movie_id",
+  otherKey: "actor_id",
+  timestamps: false,
 });
 Actor.belongsToMany(Movie, {
   through: "movie_actors",
   as: "movies",
   foreignKey: "actor_id",
+  otherKey: "movie_id",
+  timestamps: false,
 });
 
 export default Movie;
+
