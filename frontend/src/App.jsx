@@ -31,12 +31,10 @@ import "./style/navbar.css";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
-
 import LoadingSpinner from "./components/authentication/LoadingSpinner";
 
 import { useAuthStore } from "./store/authStore";
 import { useEffect } from "react";
-
 
 // protect routes that require authentication and admin role
 const ProtectedRoute = ({ children }) => {
@@ -53,7 +51,7 @@ const ProtectedRoute = ({ children }) => {
   }
 
   // Redirect to home page if the user is not an Admin
-  if (user.role !== 'Admin') {
+  if (user.role !== "Admin") {
     return <Navigate to="/" replace />;
   }
 
@@ -61,7 +59,27 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
+const AdminOrUserProtectedRoute = ({ children }) => {
+  const { isAuthenticated, user } = useAuthStore();
 
+  // Redirect to login if the user is not authenticated
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // Redirect to email verification if the user is not verified
+  if (!user.isVerified) {
+    return <Navigate to="/verify-email" replace />;
+  }
+
+  // Redirect to home page if the user role is neither Admin nor User
+  if (user.role !== "Admin" && user.role !== "User") {
+    return <Navigate to="/" replace />;
+  }
+
+  // Render the children components if all checks pass
+  return children;
+};
 
 // redirect authenticated users to the home page
 const RedirectAuthenticatedUser = ({ children }) => {
@@ -95,18 +113,72 @@ function App() {
         <Route
           path="/cms"
           element={
-            <ProtectedRoute>
+            <AdminOrUserProtectedRoute>
+              {/* Both Admin and User can access the CMS Layout */}
               <Layout />
-            </ProtectedRoute>
+            </AdminOrUserProtectedRoute>
           }
         >
-          <Route index element={<Show />} />
-          <Route path="/cms/input-drama" element={<InputDrama />} />
-          <Route path="/cms/countries" element={<Countries />} />
-          <Route path="/cms/genres" element={<Genres />} />
-          <Route path="/cms/actors" element={<Actors />} />
-          <Route path="/cms/comments" element={<Comments />} />
-          <Route path="/cms/users" element={<Users />} />
+          {/* Default route for /cms, accessible by both Admin and User */}
+          <Route index element=<ProtectedRoute>{<Show />}</ProtectedRoute> />
+
+          {/* Only Admin can access these routes */}
+          <Route
+            path="countries"
+            element={
+              <ProtectedRoute>
+                {/* Restricted to Admin only */}
+                <Countries />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="genres"
+            element={
+              <ProtectedRoute>
+                {/* Restricted to Admin only */}
+                <Genres />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="actors"
+            element={
+              <ProtectedRoute>
+                {/* Restricted to Admin only */}
+                <Actors />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="comments"
+            element={
+              <ProtectedRoute>
+                {/* Restricted to Admin only */}
+                <Comments />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="users"
+            element={
+              <ProtectedRoute>
+                {/* Restricted to Admin only */}
+                <Users />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Admin and User can access this route */}
+          <Route
+            path="input-drama"
+            element={
+              <AdminOrUserProtectedRoute>
+                {/* Both Admin and User can access InputDrama */}
+                <InputDrama />
+              </AdminOrUserProtectedRoute>
+            }
+          />
         </Route>
 
         {/* Auth Routes */}

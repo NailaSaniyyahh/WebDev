@@ -4,7 +4,6 @@ import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from 'react';
 import Footer from "./footer/Footer";
 import "../../style/searchPage.css";
-import NavigationBar from './NavigationBar';
 
 const SearchPages = () => {
   const location = useLocation(); 
@@ -99,8 +98,6 @@ const SearchPages = () => {
   const limitedMovies = Array.isArray(movies) ? movies.slice(0, 100) : [];
 
   return (
-  <>
-  <NavigationBar/>
     <section className="trending p-40 mySearch" style={{ paddingTop: '120px' }}>
       <div className="container-fluid">
         <Row>
@@ -221,7 +218,6 @@ const SearchPages = () => {
         <Footer />
       </div>
     </section>
-  </>
   );
 }
 

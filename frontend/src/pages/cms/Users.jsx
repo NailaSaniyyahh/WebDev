@@ -177,12 +177,12 @@ const Users = () => {
 
   const handleEditSubmit = async (e) => {
     e.preventDefault();
-  
+
     if (editData.password !== editData.retypePassword) {
       setError("Passwords do not match");
       return;
     }
-  
+
     try {
       // Send PUT request to update user data
       await axios.put(`http://localhost:5000/api/users/${editData.id}`, {
@@ -190,14 +190,14 @@ const Users = () => {
         email: editData.email,
         password: editData.password || undefined, // Only send password if it is set
       });
-  
+
       // Fetch updated list of users after editing the user
       const response = await axios.get("http://localhost:5000/api/users");
       setUsers(response.data.users);
-  
+
       // Show success alert
       window.alert("User updated successfully!");
-  
+
       // Reset form fields, error state, and close modal
       setError(null);
       closeEditModal();
@@ -215,7 +215,6 @@ const Users = () => {
       console.error("Error updating user:", error);
     }
   };
-  
 
   return (
     <div className="tw-px-4 tw-flex tw-flex-col tw-justify-start tw-items-center tw-bg-gray-100 tw-min-h-screen tw-w-full">

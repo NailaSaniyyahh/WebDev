@@ -1,11 +1,15 @@
 import express from "express";
-import { createMovie } from "../controllers/movies.controller.js";
+import { createMovie, getMovies } from "../controllers/movies.controller.js";
 import upload, { setUploadPath } from "../middleware/uploads.js";
 
 const router = express.Router();
 
-// Rute untuk membuat film baru dengan unggahan poster
-router.post("/movies", setUploadPath("movies"), upload.single("poster"), createMovie); // Menambahkan film dengan poster di folder "uploads/movies"
+// Route to create a new movie with a poster upload
+router.post("/movies", setUploadPath("movies"), upload.single("poster"), createMovie);
+
+// Route to get movies
+router.get("/movies", getMovies); // Fetches all movies
 
 export default router;
+
 

@@ -3,11 +3,18 @@ import Actor from "../models/actors.model.js";
 // GET /api/actors - Fetch all actors with optional pagination
 export const getActors = async (req, res) => {
   try {
-    const { count, rows: actors } = await Actor.findAndCountAll();
+    // Get the total count of actors first
+    const totalActors = await Actor.count();
+
+    // Fetch the latest 10 actors
+    const actors = await Actor.findAll({
+      limit: 10,
+      order: [["id", "DESC"]], // Order by ID in descending order
+    });
 
     res.status(200).json({
       success: true,
-      totalCount: count,
+      totalCount: totalActors,
       actors,
     });
   } catch (error) {
@@ -15,6 +22,7 @@ export const getActors = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
 
 export const addActor = async (req, res) => {
   const { name } = req.body;

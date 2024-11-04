@@ -13,21 +13,9 @@ const Movie = sequelize.define(
       autoIncrement: true,
       primaryKey: true,
     },
-    country_id: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      references: {
-        model: Country,
-        key: "id",
-      },
-    },
     title: {
       type: DataTypes.STRING(255),
       allowNull: false,
-    },
-    alt_title: {
-      type: DataTypes.STRING(255),
-      allowNull: true,
     },
     synopsis: {
       type: DataTypes.TEXT,
@@ -62,17 +50,6 @@ const Movie = sequelize.define(
 
 // Define associations
 
-// Country has many Movies, Movie belongs to one Country
-Country.hasMany(Movie, {
-  foreignKey: "country_id",
-  as: "movies",
-});
-Movie.belongsTo(Country, {
-  foreignKey: "country_id",
-  as: "country",
-
-});
-
 // Movie has many Genres (many-to-many)
 Movie.belongsToMany(Genre, {
   through: "movie_genres", // Intermediate table for the many-to-many relationship
@@ -105,5 +82,22 @@ Actor.belongsToMany(Movie, {
   timestamps: false,
 });
 
+// Movie has many Countries (many-to-many)
+Movie.belongsToMany(Country, {
+  through: "movie_countries", // New intermediate table for Movie-Country many-to-many relationship
+  as: "countries",
+  foreignKey: "movie_id",
+  otherKey: "country_id",
+  timestamps: false,
+});
+Country.belongsToMany(Movie, {
+  through: "movie_countries",
+  as: "movies",
+  foreignKey: "country_id",
+  otherKey: "movie_id",
+  timestamps: false,
+});
+
 export default Movie;
+
 

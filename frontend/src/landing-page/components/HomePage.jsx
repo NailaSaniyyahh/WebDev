@@ -7,8 +7,6 @@ import "slick-carousel/slick/slick-theme.css";
 import { FaArrowLeft, FaArrowRight, FaPlay } from "react-icons/fa";
 import MovieCard from "./MovieCard";
 import Footer from "./footer/Footer.jsx";
-import NavigationBar from "./NavigationBar.jsx";
-import 'bootstrap/dist/css/bootstrap.min.css';
 
 const HomePage = () => {
   const [videoUrl, setVideoUrl] = useState("");
@@ -113,8 +111,6 @@ const HomePage = () => {
   }, []);
   
   return (
-    <>
-    <NavigationBar />
     <div className="slider-area bg-black">
       <div className="md:container mx-auto p-0">
         <Slider {...settings}>
@@ -199,7 +195,6 @@ const HomePage = () => {
         <Footer/>
       </div>
     </div>
-    </>
   );
 };
 

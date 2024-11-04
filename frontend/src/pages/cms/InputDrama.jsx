@@ -6,7 +6,7 @@ const InputDrama = () => {
   const [selectedGenres, setSelectedGenres] = useState([]);
   const [selectedActors, setSelectedActors] = useState([]);
   const [uploadedImage, setUploadedImage] = useState(null);
-  const [selectedCountry, setSelectedCountry] = useState(null);
+  const [selectedCountries, setSelectedCountries] = useState([]);
   const [countries, setCountries] = useState([]);
   const [genresOptions, setGenresOptions] = useState([]);
   const [actorsOptions, setActorsOptions] = useState([]);
@@ -75,6 +75,10 @@ const InputDrama = () => {
     setSelectedActors(selected);
   };
 
+  const handleCountrySelect = (selected) => {
+    setSelectedCountries(selected);
+  };
+
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -103,13 +107,12 @@ const InputDrama = () => {
 
     const formData = new FormData();
     formData.append("title", title);
-    formData.append("alt_title", altTitle);
     formData.append("synopsis", synopsis);
     formData.append("year", year);
     formData.append("trailer", trailer);
     formData.append(
-      "country_id",
-      selectedCountry ? selectedCountry.value : null
+      "countries",
+      JSON.stringify(selectedCountries.map((country) => country.value))
     );
     formData.append("genres", JSON.stringify(selectedGenres));
     formData.append(
@@ -136,11 +139,10 @@ const InputDrama = () => {
 
       // Reset all fields after successful submit
       setTitle("");
-      setAltTitle("");
       setSynopsis("");
       setYear("");
       setTrailer("");
-      setSelectedCountry(null);
+      setSelectedCountries([]);
       setSelectedGenres([]);
       setSelectedActors([]);
       setUploadedImage(null);
@@ -242,8 +244,9 @@ const InputDrama = () => {
 
               {/* Right Column: Input Fields */}
               <div className="tw-flex-grow">
-                <div className="tw-grid tw-grid-cols-1 sm:tw-grid-cols-2 tw-gap-4">
-                  <div>
+                {/* Row with Title, Year, and Country */}
+                <div className="tw-grid tw-grid-cols-1 md:tw-grid-cols-3 tw-gap-4 tw-mb-4">
+                  <div className="tw-col-span-1">
                     <label>Title</label>
                     <input
                       type="text"
@@ -253,17 +256,7 @@ const InputDrama = () => {
                       className="tw-w-full tw-border tw-border-gray-300 tw-rounded-lg tw-p-2 focus:tw-outline-0 focus:tw-ring-2 focus:tw-ring-gray-300"
                     />
                   </div>
-                  <div>
-                    <label>Alternative Title</label>
-                    <input
-                      type="text"
-                      placeholder="Enter alternative title"
-                      value={altTitle}
-                      onChange={(e) => setAltTitle(e.target.value)}
-                      className="tw-w-full tw-border tw-border-gray-300 tw-rounded-lg tw-p-2 focus:tw-outline-0 focus:tw-ring-2 focus:tw-ring-gray-300"
-                    />
-                  </div>
-                  <div>
+                  <div className="tw-col-span-1">
                     <label>Year</label>
                     <input
                       type="text"
@@ -273,28 +266,31 @@ const InputDrama = () => {
                       className="tw-w-full tw-border tw-border-gray-300 tw-rounded-lg tw-p-2 focus:tw-outline-0 focus:tw-ring-2 focus:tw-ring-gray-300"
                     />
                   </div>
-                  <div>
+                  <div className="tw-col-span-1">
                     <label>Country</label>
                     <Select
                       options={countries}
-                      value={selectedCountry}
-                      onChange={setSelectedCountry}
+                      value={selectedCountries}
+                      onChange={handleCountrySelect}
                       placeholder="Select Country"
+                      isMulti
                       isSearchable
                       styles={customStyles}
                       className="tw-w-full"
                     />
                   </div>
-                  <div className="tw-col-span-2">
-                    <label>Synopsis</label>
-                    <textarea
-                      placeholder="Enter synopsis"
-                      value={synopsis}
-                      onChange={(e) => setSynopsis(e.target.value)}
-                      className="tw-w-full tw-border tw-border-gray-300 tw-rounded-lg tw-p-2 focus:tw-outline-0 focus:tw-ring-2 focus:tw-ring-gray-300"
-                      rows="4"
-                    ></textarea>
-                  </div>
+                </div>
+
+                {/* Synopsis */}
+                <div className="tw-col-span-2 tw-mb-4">
+                  <label>Synopsis</label>
+                  <textarea
+                    placeholder="Enter synopsis"
+                    value={synopsis}
+                    onChange={(e) => setSynopsis(e.target.value)}
+                    className="tw-w-full tw-border tw-border-gray-300 tw-rounded-lg tw-p-2 focus:tw-outline-0 focus:tw-ring-2 focus:tw-ring-gray-300"
+                    rows="4"
+                  ></textarea>
                 </div>
 
                 {/* Genres */}
@@ -374,3 +370,4 @@ const InputDrama = () => {
 };
 
 export default InputDrama;
+

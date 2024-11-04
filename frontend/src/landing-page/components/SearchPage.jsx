@@ -1,6 +1,5 @@
 import { Container, Row, Col, Form, Button, Dropdown } from 'react-bootstrap';
 import { useState } from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
 
 const SearchPage = ({ onSearch, onFilter }) => {
     const [searchQuery, setSearchQuery] = useState('');
