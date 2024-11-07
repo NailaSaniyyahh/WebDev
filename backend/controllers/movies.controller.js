@@ -97,10 +97,10 @@ export const getMovies = async (req, res) => {
     // Get the total count of movies
     const totalMovies = await Movie.count();
 
-    // Calculate the offset to get the last 10 movies
-    const offset = Math.max(totalMovies - 10, 0); // Ensure offset is not negative
+    // Calculate the offset to get the last 50 movies
+    const offset = Math.max(totalMovies - 50, 0); // Ensure offset is not negative
 
-    // Fetch the last 10 movies based on the calculated offset
+    // Fetch the last 50 movies based on the calculated offset
     const movies = await Movie.findAll({
       attributes: ["id", "title", "year", "synopsis", "rating", "poster", "trailer"], // Include required attributes
       include: [
@@ -124,7 +124,7 @@ export const getMovies = async (req, res) => {
         },
       ],
       offset: offset,
-      limit: 10,
+      limit: 50, // Update limit to fetch 50 movies
     });
 
     // Respond with the fetched movies
@@ -140,6 +140,7 @@ export const getMovies = async (req, res) => {
     });
   }
 };
+
 
 
 // Menghapus poster file jika terjadi error saat menyimpan

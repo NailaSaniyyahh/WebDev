@@ -6,7 +6,9 @@ const Actors = () => {
   const [actorName, setActorName] = useState("");
   const [actors, setActors] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [editingActorId, setEditingActorId] = useState(null); // ID aktor yang sedang diedit
+  const [editingActorId, setEditingActorId] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   const handleFileChange = (e) => {
     setSelectedFile(e.target.files[0]);
@@ -34,7 +36,6 @@ const Actors = () => {
 
     try {
       if (editingActorId) {
-        // Jika dalam mode edit
         const response = await axios.put(
           `http://localhost:5000/api/actors/${editingActorId}`,
           formData,
@@ -44,10 +45,8 @@ const Actors = () => {
             },
           }
         );
-        console.log("Actor updated:", response.data);
         alert("Actor updated successfully!");
       } else {
-        // Jika dalam mode tambah
         const response = await axios.post(
           "http://localhost:5000/api/actors",
           formData,
@@ -57,16 +56,12 @@ const Actors = () => {
             },
           }
         );
-        console.log("Actor added:", response.data);
         alert("Actor successfully added!");
       }
 
-      // Reset form dan ID editing
       setActorName("");
       setSelectedFile(null);
       setEditingActorId(null);
-
-      // Refresh daftar aktor
       fetchActors();
     } catch (error) {
       if (error.response) {
@@ -97,7 +92,7 @@ const Actors = () => {
       setActors((prevActors) =>
         prevActors.filter((actor) => actor.id !== actorId)
       );
-      console.log("Actor deleted successfully");
+      alert("Actor deleted successfully!");
     } catch (error) {
       console.error("Error deleting actor:", error);
     }
@@ -116,13 +111,25 @@ const Actors = () => {
     actor.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const indexOfLastActor = currentPage * itemsPerPage;
+  const indexOfFirstActor = indexOfLastActor - itemsPerPage;
+  const currentActors = filteredActors.slice(indexOfFirstActor, indexOfLastActor);
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) setCurrentPage(currentPage - 1);
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < Math.ceil(filteredActors.length / itemsPerPage)) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
   return (
     <div className="tw-px-4 tw-flex tw-flex-col tw-justify-start tw-items-center tw-bg-gray-100 tw-min-h-screen tw-w-full">
       <div className="tw-bg-white tw-rounded-lg tw-shadow-lg tw-overflow-hidden tw-w-full tw-mx-4 sm:tw-mx-6 lg:tw-mx-auto lg:tw-max-w-7xl tw-my-4">
         <div className="tw-p-4">
-          <h2 className="tw-text-2xl tw-font-bold tw-text-gray-800">
-            Page Actors
-          </h2>
+          <h2 className="tw-text-2xl tw-font-bold tw-text-gray-800">Page Actors</h2>
           <h1 className="tw-text-gray-500 tw-font-semibold tw-text-lg tw-mt-4">
             {editingActorId ? "Edit Actor" : "Insert Actor"}
           </h1>
@@ -135,7 +142,7 @@ const Actors = () => {
                 onChange={handleNameChange}
                 className="tw-w-full tw-border sm:tw-w-auto tw-bg-indigo-100/30 tw-px-4 tw-py-2 tw-rounded-lg focus:tw-outline-0 focus:tw-ring-2 focus:tw-ring-gray-300"
               />
-              <input type="file"  onChange={handleFileChange} accept="image/*" />
+              <input type="file" onChange={handleFileChange} accept="image/*" />
             </div>
             <div className="tw-mt-2 tw-flex tw-flex-col tw-space-y-2 sm:tw-space-y-0 sm:tw-space-x-4 sm:tw-flex-row tw-items-center">
               <button
@@ -161,32 +168,18 @@ const Actors = () => {
             <table className="tw-min-w-full tw-bg-white tw-border tw-border-gray-300">
               <thead>
                 <tr className="tw-bg-gray-100">
-                  <th className="tw-py-2 tw-px-4 tw-border-b tw-border-gray-300 tw-text-left">
-                    #
-                  </th>
-                  <th className="tw-py-2 tw-px-4 tw-border-b tw-border-gray-300 tw-text-left">
-                    Actor Name
-                  </th>
-                  <th className="tw-py-2 tw-px-4 tw-border-b tw-border-gray-300 tw-text-left">
-                    Photo
-                  </th>
-                  <th className="tw-py-2 tw-px-4 tw-border-b tw-border-gray-300 tw-text-left">
-                    Actions
-                  </th>
+                  <th className="tw-py-2 tw-px-4 tw-border-b tw-border-gray-300 tw-text-left">#</th>
+                  <th className="tw-py-2 tw-px-4 tw-border-b tw-border-gray-300 tw-text-left">Actor Name</th>
+                  <th className="tw-py-2 tw-px-4 tw-border-b tw-border-gray-300 tw-text-left">Photo</th>
+                  <th className="tw-py-2 tw-px-4 tw-border-b tw-border-gray-300 tw-text-left">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {filteredActors.length > 0 ? (
-                  filteredActors.map((actor, index) => (
-                    <tr key={actor.id} className={
-                          index % 2 === 0 ? "tw-bg-white" : "tw-bg-gray-50"
-                        }>
-                      <td className="tw-py-2 tw-px-4 tw-border-b tw-border-gray-300">
-                        {index + 1}
-                      </td>
-                      <td className="tw-py-2 tw-px-4 tw-border-b tw-border-gray-300">
-                        {actor.name}
-                      </td>
+                {currentActors.length > 0 ? (
+                  currentActors.map((actor, index) => (
+                    <tr key={actor.id} className={index % 2 === 0 ? "tw-bg-white" : "tw-bg-gray-50"}>
+                      <td className="tw-py-2 tw-px-4 tw-border-b tw-border-gray-300">{indexOfFirstActor + index + 1}</td>
+                      <td className="tw-py-2 tw-px-4 tw-border-b tw-border-gray-300">{actor.name}</td>
                       <td className="tw-py-2 tw-px-4 tw-border-b tw-border-gray-300">
                         {actor.profile_path ? (
                           <img
@@ -203,19 +196,11 @@ const Actors = () => {
                         )}
                       </td>
                       <td className="tw-py-2 tw-px-4 tw-border-b tw-border-gray-300">
-                        <a
-                          href="#"
-                          className="tw-text-blue-600 hover:tw-underline"
-                          onClick={() => handleEdit(actor)}
-                        >
+                        <a onClick={() => handleEdit(actor)} className="tw-text-blue-600 hover:tw-underline tw-cursor-pointer">
                           Edit
                         </a>
                         <span className="tw-text-gray-500 tw-px-2">|</span>
-                        <a
-                          href="#"
-                          className="tw-text-red-600 hover:tw-underline"
-                          onClick={() => handleDelete(actor.id)}
-                        >
+                        <a onClick={() => handleDelete(actor.id)} className="tw-text-red-600 hover:tw-underline tw-cursor-pointer">
                           Delete
                         </a>
                       </td>
@@ -223,16 +208,40 @@ const Actors = () => {
                   ))
                 ) : (
                   <tr>
-                    <td
-                      className="tw-py-2 tw-px-4 tw-border-b tw-border-gray-300"
-                      colSpan="4"
-                    >
-                      No actors found
-                    </td>
+                    <td className="tw-py-2 tw-px-4 tw-border-b tw-border-gray-300" colSpan="4">No actors found</td>
                   </tr>
                 )}
               </tbody>
             </table>
+          </div>
+
+          <div className="tw-flex tw-items-center tw-justify-between tw-border-t tw-border-gray-200 tw-bg-white tw-px-4 tw-py-3 sm:tw-px-6">
+            <div className="tw-flex tw-flex-1 tw-justify-between sm:tw-hidden">
+              <button onClick={handlePreviousPage} disabled={currentPage === 1} className="tw-relative tw-inline-flex tw-items-center tw-rounded-md tw-border tw-border-gray-300 tw-bg-white tw-px-4 tw-py-2 tw-text-sm tw-font-medium tw-text-gray-700 hover:tw-bg-gray-50">
+                Previous
+              </button>
+              <button onClick={handleNextPage} disabled={currentPage === Math.ceil(filteredActors.length / itemsPerPage)} className="tw-relative tw-ml-3 tw-inline-flex tw-items-center tw-rounded-md tw-border tw-border-gray-300 tw-bg-white tw-px-4 tw-py-2 tw-text-sm tw-font-medium tw-text-gray-700 hover:tw-bg-gray-50">
+                Next
+              </button>
+            </div>
+            <div className=" tw-hidden sm:tw-flex sm:tw-flex-1 sm:tw-items-center sm:tw-justify-between">
+              <p className="tw-text-sm tw-text-gray-700">
+                Showing {indexOfFirstActor + 1} to {Math.min(indexOfLastActor, filteredActors.length)} of {filteredActors.length} results
+              </p>
+              <nav className="tw-isolate tw-inline-flex -tw-space-x-px tw-rounded-md tw-shadow-sm" aria-label="Pagination">
+                <button onClick={handlePreviousPage} className="tw-relative tw-inline-flex tw-items-center tw-rounded-l-md tw-px-2 tw-py-2 tw-text-gray-400 tw-ring-1 tw-ring-inset tw-ring-gray-300 hover:tw-bg-gray-50 focus:tw-z-20">
+                  Previous
+                </button>
+                {[...Array(Math.ceil(filteredActors.length / itemsPerPage))].map((_, pageIndex) => (
+                  <button key={pageIndex} onClick={() => setCurrentPage(pageIndex + 1)} className={`tw-relative tw-inline-flex tw-items-center tw-px-4 tw-py-2 tw-text-sm tw-font-semibold ${pageIndex + 1 === currentPage ? "tw-bg-indigo-600 tw-text-white" : "tw-text-gray-900 tw-ring-1 tw-ring-inset tw-ring-gray-300 hover:tw-bg-gray-50"}`}>
+                    {pageIndex + 1}
+                  </button>
+                ))}
+                <button onClick={handleNextPage} className="tw-relative tw-inline-flex tw-items-center tw-rounded-r-md tw-px-2 tw-py-2 tw-text-gray-400 tw-ring-1 tw-ring-inset tw-ring-gray-300 hover:tw-bg-gray-50 focus:tw-z-20">
+                  Next
+                </button>
+              </nav>
+            </div>
           </div>
         </div>
       </div>

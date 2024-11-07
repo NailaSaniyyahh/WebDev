@@ -19,6 +19,8 @@ const Users = () => {
     email: "",
     password: "",
   });
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -36,22 +38,16 @@ const Users = () => {
         setLoading(false);
       }
     };
-
     fetchUsers();
   }, []);
 
   const handleDeleteUser = async (userId) => {
-    // Confirm deletion with the user
     if (!window.confirm("Are you sure you want to delete this user?")) return;
-
     try {
-      // Send DELETE request to delete user
       await axios.delete(`http://localhost:5000/api/users/${userId}`);
-
-      // Fetch updated list of users
       const response = await axios.get("http://localhost:5000/api/users");
       setUsers(response.data.users);
-      setError(null); // Clear any previous errors
+      setError(null);
     } catch (error) {
       console.error("Error deleting user:", error);
       setError("Failed to delete user");
@@ -102,9 +98,7 @@ const Users = () => {
     }
   };
 
-  const handleSearch = (e) => {
-    setSearchTerm(e.target.value);
-  };
+  const handleSearch = (e) => setSearchTerm(e.target.value);
 
   const filteredUsers = users.filter((user) =>
     user.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -117,46 +111,26 @@ const Users = () => {
 
   const handleAddUser = async () => {
     try {
-      // Send request to create a new user
       await axios.post("http://localhost:5000/api/users", {
         name: newUser.username,
         email: newUser.email,
         password: newUser.password,
       });
 
-      // Fetch the updated list of users after adding the new user
       const response = await axios.get("http://localhost:5000/api/users");
-      setUsers(response.data.users); // Update the users state with the new list
+      setUsers(response.data.users);
 
-      // Reset form fields and error state after successful submission
       setNewUser({ username: "", email: "", password: "" });
       setError(null);
     } catch (error) {
-      // Fetch users even when an error occurs
-      try {
-        const response = await axios.get("http://localhost:5000/api/users");
-        setUsers(response.data.users); // Update the users state with the current list
-      } catch (fetchError) {
-        console.error("Error fetching users after failed add:", fetchError);
-      }
-
-      // Display the specific error message if available
-      if (
-        error.response &&
-        error.response.data &&
-        error.response.data.message
-      ) {
-        setError(error.response.data.message);
-      } else {
-        setError("Failed to add user");
-      }
       console.error("Error adding user:", error);
+      setError("Failed to add user");
     }
   };
 
   const openEditModal = (user) => {
     setEditData({
-      id: user.id, // Add user ID here
+      id: user.id,
       username: user.name,
       email: user.email,
       password: "",
@@ -184,35 +158,34 @@ const Users = () => {
     }
 
     try {
-      // Send PUT request to update user data
       await axios.put(`http://localhost:5000/api/users/${editData.id}`, {
         name: editData.username,
         email: editData.email,
-        password: editData.password || undefined, // Only send password if it is set
+        password: editData.password || undefined,
       });
 
-      // Fetch updated list of users after editing the user
       const response = await axios.get("http://localhost:5000/api/users");
       setUsers(response.data.users);
 
-      // Show success alert
       window.alert("User updated successfully!");
-
-      // Reset form fields, error state, and close modal
-      setError(null);
       closeEditModal();
     } catch (error) {
-      // Display specific error message if available
-      if (
-        error.response &&
-        error.response.data &&
-        error.response.data.message
-      ) {
-        setError(error.response.data.message);
-      } else {
-        setError("Failed to update user");
-      }
       console.error("Error updating user:", error);
+      setError("Failed to update user");
+    }
+  };
+
+  const indexOfLastUser = currentPage * itemsPerPage;
+  const indexOfFirstUser = indexOfLastUser - itemsPerPage;
+  const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) setCurrentPage(currentPage - 1);
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < Math.ceil(filteredUsers.length / itemsPerPage)) {
+      setCurrentPage(currentPage + 1);
     }
   };
 
@@ -308,7 +281,7 @@ const Users = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredUsers.map((user, index) => (
+                    {currentUsers.map((user, index) => (
                       <tr
                         key={user.id}
                         className={
@@ -316,7 +289,7 @@ const Users = () => {
                         }
                       >
                         <td className="tw-py-2 tw-px-4 tw-border-b tw-border-gray-300">
-                          {index + 1}
+                          {index + 1 + (currentPage - 1) * itemsPerPage}
                         </td>
                         <td className="tw-py-2 tw-px-4 tw-border-b tw-border-gray-300">
                           {user.name}
@@ -392,6 +365,60 @@ const Users = () => {
               </div>
             )}
           </div>
+
+          {/* Pagination Controls */}
+          <div className="tw-px-6 tw-py-3 tw-border-t tw-border-gray-200 tw-bg-white tw-flex tw-items-center tw-justify-between">
+            <div className="tw-flex tw-flex-1 tw-justify-between sm:tw-hidden">
+              <button
+                onClick={handlePreviousPage}
+                disabled={currentPage === 1}
+                className="tw-relative tw-inline-flex tw-items-center tw-rounded-md tw-border tw-border-gray-300 tw-bg-white tw-px-4 tw-py-2 tw-text-sm tw-font-medium tw-text-gray-700 hover:tw-bg-gray-50"
+              >
+                Previous
+              </button>
+              <button
+                onClick={handleNextPage}
+                disabled={currentPage === Math.ceil(filteredUsers.length / itemsPerPage)}
+                className="tw-relative tw-ml-3 tw-inline-flex tw-items-center tw-rounded-md tw-border tw-border-gray-300 tw-bg-white tw-px-4 tw-py-2 tw-text-sm tw-font-medium tw-text-gray-700 hover:tw-bg-gray-50"
+              >
+                Next
+              </button>
+            </div>
+            <div className="tw-hidden sm:tw-flex sm:tw-flex-1 sm:tw-items-center sm:tw-justify-between">
+              <p className="tw-text-sm tw-text-gray-700">
+                Showing {indexOfFirstUser + 1} to {Math.min(indexOfLastUser, filteredUsers.length)} of {filteredUsers.length} results
+              </p>
+              <nav className="tw-isolate tw-inline-flex -tw-space-x-px tw-rounded-md tw-shadow-sm" aria-label="Pagination">
+                <button
+                  onClick={handlePreviousPage}
+                  disabled={currentPage === 1}
+                  className="tw-relative tw-inline-flex tw-items-center tw-rounded-l-md tw-px-2 tw-py-2 tw-text-gray-400 tw-ring-1 tw-ring-inset tw-ring-gray-300 hover:tw-bg-gray-50"
+                >
+                  Previous
+                </button>
+                {[...Array(Math.ceil(filteredUsers.length / itemsPerPage))].map((_, pageIndex) => (
+                  <button
+                    key={pageIndex}
+                    onClick={() => setCurrentPage(pageIndex + 1)}
+                    className={`tw-relative tw-inline-flex tw-items-center tw-px-4 tw-py-2 tw-text-sm tw-font-semibold ${
+                      pageIndex + 1 === currentPage
+                        ? "tw-bg-indigo-600 tw-text-white"
+                        : "tw-text-gray-900 tw-ring-1 tw-ring-inset tw-ring-gray-300 hover:tw-bg-gray-50"
+                    }`}
+                  >
+                    {pageIndex + 1}
+                  </button>
+                ))}
+                <button
+                  onClick={handleNextPage}
+                  disabled={currentPage === Math.ceil(filteredUsers.length / itemsPerPage)}
+                  className="tw-relative tw-inline-flex tw-items-center tw-rounded-r-md tw-px-2 tw-py-2 tw-text-gray-400 tw-ring-1 tw-ring-inset tw-ring-gray-300 hover:tw-bg-gray-50"
+                >
+                  Next
+                </button>
+              </nav>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -460,3 +487,5 @@ const Users = () => {
 };
 
 export default Users;
+
+
