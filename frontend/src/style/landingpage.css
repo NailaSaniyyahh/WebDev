@@ -459,40 +459,52 @@ input:focus{
     padding: 40px;
   }
   
-.dropDownProfile{
-    position: absolute;
-    top: 4.5rem;
-    right: 1.5rem;
-    width: 120px;
-    padding: 15px;
-    border-radius: 8px;
-    background-color: white;
-    border: 1px solid gray;
-}
-
-.dropDownProfile::berfore{
-    content: '';
-    position: absolute;
-    top: -0.7rem;
-    right: 1.1rem;
-    width: 20px;
-    height: 20px;
-    transform: rotate(45deg);
-    background-color: white;
-    border-left: 1px solid gray;
-    border-top: 1px solid gray;
-}
-
-.dropDownProfile .dropdown-menu {
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    margin-top: 10px; /* Memberikan jarak agar dropdown tidak menempel pada icon */
-  }
-  
-#dropdown-profile {
+/* Style untuk ikon profil */
+.dropdown-profile {
+    position: relative;
+    display: inline-block;
     cursor: pointer;
 }
+
+.profile-icon {
+    font-size: 1.8rem;
+    color: #e5e5e5;
+    transition: color 0.3s;
+}
+
+.profile-icon:hover {
+    color: #ffffff;
+}
+
+/* Style untuk menu dropdown */
+.dropdown-menu-custom {
+    position: absolute;
+    top: 2.5rem; /* Jarak dari ikon profil */
+    right: 0;
+    background-color: #333;
+    border-radius: 8px;
+    padding: 10px;
+    min-width: 120px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+}
+
+.dropdown-item {
+    color: #e5e5e5;
+    padding: 8px;
+    text-decoration: none;
+    transition: background-color 0.3s;
+    border-radius: 4px;
+    text-align: left;
+}
+
+.dropdown-item:hover {
+    background-color: #555;
+    color: #ffffff;
+}
+
 
 .filter-block{
     align-items: center;
@@ -596,22 +608,40 @@ input:focus{
 }
  
 .slick-prev, .slick-next {
-    /* font-size: 3rem; */
-    color: red;
+    color: red !important; /* Warna panah menjadi merah */
     z-index: 10;
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
     cursor: pointer;
+    font-size: 2rem !important; /* Sesuaikan ukuran jika diperlukan */
 }
-  
+
 .slick-prev {
-    left: 5px;
+    left: 5px !important; /* Sesuaikan jarak dari tepi kiri */
 }
-  
+
 .slick-next {
-    right: 5px;
+    right: 5px !important; /* Sesuaikan jarak dari tepi kanan */
 }
+
+.play-button {
+    background-color: #28a745; /* Warna hijau */
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.play-button:hover {
+    background-color: #218838; /* Warna hijau yang lebih gelap saat hover */
+}
+
 
 .icons {
   color: white; /* Adjust color as needed */
@@ -653,4 +683,45 @@ input:focus{
         max-width: 100%; /* Pastikan gambar tidak melampaui batas */
         height: auto; /* Sesuaikan tinggi dengan lebar */
     }
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8); /* Overlay dengan transparansi */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000; /* Pastikan berada di atas elemen lain */
+}
+
+.modal-content {
+    background-color: #333;
+    border-radius: 8px;
+    overflow: hidden;
+    max-width: 800px; /* Atur ukuran maksimum */
+    width: 90%;
+    position: relative;
+}
+
+.modal-content iframe {
+    width: 100%;
+    height: 450px; /* Atur tinggi iframe */
+}
+
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #ff0000;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 1rem;
+    z-index: 1001;
 }

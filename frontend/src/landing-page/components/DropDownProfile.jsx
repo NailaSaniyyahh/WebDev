@@ -1,29 +1,33 @@
-import React from "react";
-import { Dropdown } from 'react-bootstrap';
+import React, { useState } from "react";
 import { FaUserCircle } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import "../../style/landingpage.css";
+import "../../style/navbar.css";
+import { useAuthStore } from "../../store/authStore";
 
 const DropDownProfile = () => {
-  return (
-    <Dropdown>
-      <Dropdown.Toggle
-        variant="link"
-        id="dropdown-profile"
-        className="text-white"
-        style={{ display: "flex", alignItems: "center", border: 'none', backgroundColor: 'transparent' }} // No border or background
-      >
-        <FaUserCircle className="icons" style={{ fontSize: '1.5rem' }} />
-      </Dropdown.Toggle>
+  const { isAuthenticated } = useAuthStore(); // Ambil status login
 
-      <Dropdown.Menu align="end" className="bg-dark">
-        <Dropdown.Item as={Link} to="/auth/login" className="text-white">
-          Login
-        </Dropdown.Item>
-        <Dropdown.Item as={Link} to="/auth/signup" className="text-white">
-          Signup
-        </Dropdown.Item>
-      </Dropdown.Menu>
-    </Dropdown>
+  const [isOpen, setIsOpen] = useState(false);
+
+  const toggleDropdown = () => {
+    setIsOpen(!isOpen);
+  };
+
+  return (
+    <>
+      {!isAuthenticated && (
+        <div className="dropdown-profile" onClick={toggleDropdown}>
+          <FaUserCircle className="profile-icon" />
+          {isOpen && (
+            <div className="dropdown-menu-custom">
+              <Link to="/login" className="dropdown-item">Login</Link>
+              <Link to="/signup" className="dropdown-item">Signup</Link>
+            </div>
+          )}
+        </div>
+      )}
+    </>
   );
 };
 
