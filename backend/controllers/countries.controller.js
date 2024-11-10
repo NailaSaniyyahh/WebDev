@@ -39,13 +39,8 @@ export const createCountry = async (req, res) => {
 
 // GET /api/countries
 export const getCountries = async (req, res) => {
-  const { page = 1, limit = 25 } = req.query;
-  const offset = (page - 1) * limit;
-
   try {
     const countries = await Country.findAll({
-      limit: parseInt(limit),
-      offset: parseInt(offset),
       order: [['name', 'ASC']], // Sort alphabetically
     });
     res.status(200).json({ countries });

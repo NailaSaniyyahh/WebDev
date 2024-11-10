@@ -12,6 +12,7 @@ import genreRoutes from "./routes/genres.route.js";
 import actorRoutes from "./routes/actors.route.js";
 import movieRoutes from "./routes/movies.route.js"; // Import movie routes
 import userRoutes from "./routes/users.route.js"; // Import user routes
+import reviewRoutes from "./routes/reviews.route.js";
 
 import movieRoute from "./routes/landing-page/movieRoutes.js"
 import genreRoute from "./routes/landing-page/genreRoute.js";
@@ -44,6 +45,7 @@ app.use("/api", genreRoutes);
 app.use("/api", actorRoutes);
 app.use("/api", movieRoutes); // Tambahkan movie route ke API
 app.use("/api", userRoutes);
+app.use("/api", reviewRoutes);
 
 // Route landing-page
 app.use("/landing", movieRoute); // Pastikan ini mengarah ke folder landing-page jika sesuai

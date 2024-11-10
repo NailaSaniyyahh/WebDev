@@ -20,5 +20,6 @@ const Country = sequelize.define(
   }
 );
 
+
 export default Country;
 
