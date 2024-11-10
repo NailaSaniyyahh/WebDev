@@ -1,4 +1,4 @@
-import sequelize from '../../db/connectDB.js';
+// import sequelize from '../../db/connectDB.js';
 
 // Fetch all movies
 export const getMovies = async (req, res) => {
@@ -92,13 +92,105 @@ const fetchMoviesByCategory = async (category, res) => {
 };
 
 // Fetch popular movies
-export const getPopularMovies = (req, res) => fetchMoviesByCategory('popular', res);
+export const getPopularMovies = async (req, res) => {
+  const sql = `
+    SELECT m.*, 
+           GROUP_CONCAT(DISTINCT g.name) AS genres, 
+           GROUP_CONCAT(DISTINCT c.name) AS countries, 
+           GROUP_CONCAT(DISTINCT a.name) AS actors 
+    FROM movies m
+    LEFT JOIN movie_genres mg ON m.id = mg.movie_id
+    LEFT JOIN genres g ON mg.genre_id = g.id
+    LEFT JOIN movie_countries mc ON m.id = mc.movie_id
+    LEFT JOIN countries c ON mc.country_id = c.id
+    LEFT JOIN movie_actors ma ON m.id = ma.movie_id
+    LEFT JOIN actors a ON ma.actor_id = a.id
+    WHERE m.rating BETWEEN 7.00 AND 8.50
+    GROUP BY m.id
+  `;
+
+  try {
+    const [results] = await sequelize.query(sql);
+    const movies = results.map(movie => ({
+      ...movie,
+      genres: movie.genres ? movie.genres.split(',') : [],
+      countries: movie.countries ? movie.countries.split(',') : [],
+      actors: movie.actors ? movie.actors.split(',') : [],
+    }));
+    res.status(200).json(movies);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 
 // Fetch top-rated movies
-export const getTopRatedMovies = (req, res) => fetchMoviesByCategory('top_rated', res);
+export const getTopRatedMovies = async (req, res) => {
+  const sql = `
+    SELECT m.*, 
+           GROUP_CONCAT(DISTINCT g.name) AS genres, 
+           GROUP_CONCAT(DISTINCT c.name) AS countries, 
+           GROUP_CONCAT(DISTINCT a.name) AS actors 
+    FROM movies m
+    LEFT JOIN movie_genres mg ON m.id = mg.movie_id
+    LEFT JOIN genres g ON mg.genre_id = g.id
+    LEFT JOIN movie_countries mc ON m.id = mc.movie_id
+    LEFT JOIN countries c ON mc.country_id = c.id
+    LEFT JOIN movie_actors ma ON m.id = ma.movie_id
+    LEFT JOIN actors a ON ma.actor_id = a.id
+    WHERE m.rating BETWEEN 8.00 AND 9.99
+    GROUP BY m.id
+  `;
+
+  try {
+    const [results] = await sequelize.query(sql);
+    const movies = results.map(movie => ({
+      ...movie,
+      genres: movie.genres ? movie.genres.split(',') : [],
+      countries: movie.countries ? movie.countries.split(',') : [],
+      actors: movie.actors ? movie.actors.split(',') : [],
+    }));
+    res.status(200).json(movies);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 
 // Fetch upcoming movies
-export const getUpcomingMovies = (req, res) => fetchMoviesByCategory('upcoming', res);
+export const getUpcomingMovies = async (req, res) => {
+  const currentYear = new Date().getFullYear();
+
+  const sql = `
+    SELECT m.*, 
+           GROUP_CONCAT(DISTINCT g.name) AS genres, 
+           GROUP_CONCAT(DISTINCT c.name) AS countries, 
+           GROUP_CONCAT(DISTINCT a.name) AS actors 
+    FROM movies m
+    LEFT JOIN movie_genres mg ON m.id = mg.movie_id
+    LEFT JOIN genres g ON mg.genre_id = g.id
+    LEFT JOIN movie_countries mc ON m.id = mc.movie_id
+    LEFT JOIN countries c ON mc.country_id = c.id
+    LEFT JOIN movie_actors ma ON m.id = ma.movie_id
+    LEFT JOIN actors a ON ma.actor_id = a.id
+    WHERE m.year > ?
+    GROUP BY m.id
+  `;
+
+  try {
+    const [results] = await sequelize.query(sql, { replacements: [currentYear] });
+    const movies = results.map(movie => ({
+      ...movie,
+      genres: movie.genres ? movie.genres.split(',') : [],
+      countries: movie.countries ? movie.countries.split(',') : [],
+      actors: movie.actors ? movie.actors.split(',') : [],
+    }));
+    res.status(200).json(movies);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 
 // Fetch top movies
 export const getTopMovies = async (req, res) => {
@@ -227,3 +319,32 @@ const handleQueryResponse = (res, field = null) => (err, results) => {
   res.status(200).json(results);
 };
 
+import sequelize from '../../db/connectDB.js';
+
+// Fungsi untuk menghitung dan memperbarui rata-rata rating pada film
+export const updateMovieRating = async (movieId) => {
+    const reviewQuery = 'SELECT rating FROM reviews WHERE movie_id = ?';
+
+    try {
+        // Ambil semua rating review terkait film
+        const [reviews] = await sequelize.query(reviewQuery, { replacements: [movieId] });
+
+        if (reviews.length === 0) {
+            // Jika tidak ada review, set rating movie ke null
+            await sequelize.query('UPDATE movies SET rating = NULL WHERE id = ?', { replacements: [movieId] });
+            return null;
+        }
+
+        // Hitung rata-rata rating
+        const totalRating = reviews.reduce((sum, review) => sum + parseFloat(review.rating), 0);
+        const avgRating = (totalRating / reviews.length).toFixed(2);
+
+        // Perbarui rating di tabel movies
+        await sequelize.query('UPDATE movies SET rating = ? WHERE id = ?', { replacements: [avgRating, movieId] });
+
+        return avgRating;
+    } catch (error) {
+        console.error('Error updating movie rating:', error);
+        throw error;
+    }
+};
