@@ -212,7 +212,9 @@ const SearchPages = () => {
               {limitedMovies.length > 0 ? limitedMovies.map((movie, index) => (
                 <Col key={index} xs={4} sm={4} md={5} lg={4} xl={2} className="text-center">
                   <Link to={`/detail/${movie.id}`}>
-                    <Image src={movie.poster} alt={movie.title} className="br-12" />
+                    <Image src={movie.poster.startsWith("uploads")
+                                        ? `http://localhost:5000/${movie.poster}`
+                                        : movie.poster} alt={movie.title} className="br-12" />
                     <h5>{movie.title}</h5>
                   </Link>
                 </Col>
