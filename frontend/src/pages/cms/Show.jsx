@@ -20,7 +20,7 @@ const Show = () => {
       try {
         const response = await axios.get("http://localhost:5000/api/movies");
         setMovies(response.data.movies);
-  
+
         const uniqueCountries = [
           ...new Set(
             response.data.movies.flatMap((movie) =>
@@ -29,12 +29,12 @@ const Show = () => {
           ),
         ].sort((a, b) => a.localeCompare(b)); // Sort countries alphabetically
         setCountries(uniqueCountries);
-  
+
         const uniqueYears = [
           ...new Set(response.data.movies.map((movie) => movie.year)),
         ].sort((a, b) => b - a); // Sort years in descending order
         setYears(uniqueYears);
-  
+
         const uniqueGenres = [
           ...new Set(
             response.data.movies.flatMap((movie) =>
@@ -47,10 +47,9 @@ const Show = () => {
         console.error("Error fetching movies:", error);
       }
     };
-  
+
     fetchMovies();
   }, []);
-  
 
   const extractYouTubeVideoId = (url) => {
     const regex =
@@ -64,7 +63,9 @@ const Show = () => {
 
     try {
       await axios.delete(`http://localhost:5000/api/movies/${movieId}`);
-      setMovies((prevMovies) => prevMovies.filter((movie) => movie.id !== movieId));
+      setMovies((prevMovies) =>
+        prevMovies.filter((movie) => movie.id !== movieId)
+      );
       alert("Movie deleted successfully!");
     } catch (error) {
       console.error("Error deleting movie:", error);
@@ -119,7 +120,7 @@ const Show = () => {
       <div className="tw-mt-4 tw-bg-white tw-rounded-lg tw-shadow-lg tw-w-full lg:tw-max-w-6xl tw-overflow-hidden">
         <div className="tw-p-4">
           <h2 className="tw-text-2xl tw-font-bold tw-text-gray-800">
-            Show Drama
+            Page Show Drama
           </h2>
         </div>
 
@@ -405,7 +406,6 @@ const Show = () => {
       )}
     </div>
   );
-
 };
 
 export default Show;
