@@ -1,22 +1,26 @@
 import { useState, useEffect } from 'react';
 import { Container, Row, Col, Form, Button } from 'react-bootstrap'; 
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom'; // Import useNavigate for redirection
 import AllActor from './AllActor'; 
 import Footer from "./footer/Footer.jsx";
 import NavigationBar from './NavigationBar.jsx';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import "../../style/landingpage.css";
+import "../../style/MovieCard.css";
+import "../../style/navbar.css";
 
 const DetailPage = () => {
     const { id } = useParams();
+    const navigate = useNavigate(); // Initialize navigate for redirecting
     const [movie, setMovie] = useState(null);
     const [comments, setComments] = useState([]); 
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [newComment, setNewComment] = useState({
         user: '',
         rating: 1,
         text: ''
     });
-    
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setNewComment({ ...newComment, [name]: value });
@@ -24,28 +28,35 @@ const DetailPage = () => {
     
     const handleCommentSubmit = async (e) => {
         e.preventDefault();
-    
+
+        if (!isLoggedIn) {
+            alert("Please log in to add a review.");
+            navigate('/login'); // Redirect to login page if not logged in
+            return;
+        }
+
         const reviewData = {
             movieId: id,
             user: newComment.user,
             rating: newComment.rating,
             text: newComment.text,
         };
-    
+
         try {
-            const response = await fetch(`http://localhost:5000/reviews/add`, {
+            const response = await fetch("http://localhost:5000/reviews/add", {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(reviewData),
+                credentials: 'same-origin'
             });
-    
+
             if (response.ok) {
                 alert('Review added successfully');
                 const newReview = await response.json();
                 setComments([...comments, newReview]);
                 setNewComment({ user: '', rating: 1, text: '' });
             } else {
-                const errorData = await response.json(); // Cetak pesan error dari server
+                const errorData = await response.json();
                 console.error('Failed to add review:', errorData);
                 alert(`Failed to add review: ${errorData.error || 'Unknown error'}`);
             }
@@ -53,38 +64,31 @@ const DetailPage = () => {
             console.error('Error adding review:', error);
             alert('Error adding review');
         }
-    };    
+    };
 
     useEffect(() => {
-        const checkAuth = async () => {
+        // Check login status
+        const checkLoginStatus = async () => {
             try {
                 const response = await fetch("http://localhost:5000/api/auth/check-auth", {
-                    credentials: "include", // Untuk mengirim cookie
+                    credentials: 'include'
                 });
                 const data = await response.json();
-                if (data.success) {
-                    setIsLoggedIn(true);
-                } else {
-                    setIsLoggedIn(false);
-                }
+                setIsLoggedIn(data.success); // Update login status
             } catch (error) {
-                console.error("Error checking auth:", error);
+                console.error('Error checking login status:', error);
                 setIsLoggedIn(false);
             }
         };
-    
-        checkAuth();
-    }, []);
+        checkLoginStatus();
 
-
-    useEffect(() => {
-        // Ambil data film dari landing
+        // Fetch movie data
         fetch(`http://localhost:5000/landing/movies/${id}`)
             .then((res) => res.json())
             .then((data) => {
-                console.log(data); // Cek data yang diterima dari landing
-                setMovie(data); // Data film, aktor, genre, review
-                setComments(data.reviews); // Isi review dari response landing
+                console.log(data);
+                setMovie(data);
+                setComments(data.reviews);
             })
             .catch((err) => console.error('Error fetching movie:', err));
     }, [id]);
@@ -111,7 +115,7 @@ const DetailPage = () => {
                             alt="Movie Poster"
                         />
                     </Col>
-                    <Col xs ={5} sm={6} md={8}>
+                    <Col xs={5} sm={6} md={8}>
                         <div style={{ marginTop: '50px' }}>
                             <h1 style={{ fontSize: '35px', fontFamily: "'Bebas Neue', sans-serif", color: 'white' }}>{movie.title}</h1>
 
@@ -165,9 +169,8 @@ const DetailPage = () => {
                     </Col>
                 </Row>
 
-                {/* Bagian Review */}
                 <Row className="mt-5">
-                    <Col xs ={12} md={12}>
+                    <Col xs={12} md={12}>
                         <h2 className="review-title mb-4">Reviews</h2> 
                         {comments && comments.length > 0 ? (
                             comments.map((review, index) => (
@@ -178,9 +181,9 @@ const DetailPage = () => {
                                     padding: review.isNew ? '10px' : '0',
                                     border: review.isNew ? '2px solid #FFD700' : 'none'
                                 }}>
-                                    <strong style={{ color: "white" }}>{review.user || review.author}</strong> - {review.date || 'N/A'}
+                                    <strong style={{ color: "white" }}>{review.author}</strong> - {review.date || 'N/A'}
                                     <br />
-                                    {review.text || review.content}
+                                    {review.content}
                                     <br />
                                     <span style={{ color: "gold" }}>{'★'.repeat(review.rating)}</span>
                                 </div>
@@ -191,7 +194,7 @@ const DetailPage = () => {
                     </Col>
                 </Row>
 
-                {/* Tambah Review */}
+                {/* Tampilkan form jika pengguna login */}
                 {isLoggedIn ? (
                     <Row className="mb-4 mt-4">
                         <Col md={12}>
@@ -241,12 +244,13 @@ const DetailPage = () => {
                         </Col>
                     </Row>
                 ) : (
-                    <p style={{ fontWeight: 'bold', fontSize: '36px', textAlign: 'center' }} className='mt-4'>Please log in to add a review.</p>
+                    <p style={{ color: 'white', textAlign: 'center', fontWeight: 'bold', marginTop: '20px', fontSize:'30px' }}>
+                        Please log in to add a review.
+                    </p>
                 )}
 
                 <Footer/>
             </Container>
-            
         </div>
         </>
     );

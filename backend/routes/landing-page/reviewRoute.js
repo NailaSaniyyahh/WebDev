@@ -6,7 +6,7 @@ const router = express.Router();
 
 // Define routes
 router.get('/', getReview);
-router.post('/add', isAuthenticated, addReview);
+router.post('/add', addReview);
 
 export default router; // Ekspor default menggunakan ESM
 
