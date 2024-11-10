@@ -22,6 +22,14 @@ export const createMovie = async (req, res) => {
 
     console.log(typeof genres, typeof actors, typeof countries);
 
+    // Validate if the file is an image
+    if (req.file && !req.file.mimetype.startsWith("image/")) {
+      return res.status(400).json({
+        success: false,
+        message: "Only image files are allowed for the poster.",
+      });
+    }
+
     // Save poster file path if present
     const posterPath = req.file ? `uploads/movies/${req.file.filename}` : null;
 
@@ -91,16 +99,17 @@ export const createMovie = async (req, res) => {
     });
   }
 };
+
   
 export const getMovies = async (req, res) => {
   try {
     // Get the total count of movies
     const totalMovies = await Movie.count();
 
-    // Calculate the offset to get the last 50 movies
-    const offset = Math.max(totalMovies - 50, 0); // Ensure offset is not negative
+    // Calculate the offset to get the last 100 movies
+    const offset = Math.max(totalMovies - 100, 0); // Ensure offset is not negative
 
-    // Fetch the last 50 movies based on the calculated offset
+    // Fetch the last 100 movies based on the calculated offset
     const movies = await Movie.findAll({
       attributes: ["id", "title", "year", "synopsis", "rating", "poster", "trailer"], // Include required attributes
       include: [
@@ -123,8 +132,8 @@ export const getMovies = async (req, res) => {
           through: { attributes: [] },
         },
       ],
-      offset: offset,
-      limit: 50, // Update limit to fetch 50 movies
+      order: [["id", "DESC"]], // Order by id in descending order to get latest movies
+      limit: 100, // Limit to fetch only the latest 100 movies
     });
 
     // Respond with the fetched movies
@@ -142,12 +151,52 @@ export const getMovies = async (req, res) => {
 };
 
 
+export const deleteMovie = async (req, res) => {
+  const { id } = req.params;
 
-// Menghapus poster file jika terjadi error saat menyimpan
-const deletePoster = (posterPath) => {
   try {
-    fs.unlinkSync(posterPath);
+    // Temukan movie berdasarkan ID
+    const movie = await Movie.findByPk(id, {
+      include: [
+        { model: Genre, as: "genres", through: { attributes: [] } },
+        { model: Actor, as: "actors", through: { attributes: [] } },
+        { model: Country, as: "countries", through: { attributes: [] } },
+      ],
+    });
+
+    if (!movie) {
+      return res.status(404).json({
+        success: false,
+        message: "Movie not found",
+      });
+    }
+
+    // Hapus file poster jika ada
+    if (movie.poster) {
+      const posterPath = path.resolve(movie.poster);
+      fs.unlink(posterPath, (err) => {
+        if (err) console.error("Failed to delete poster file:", err);
+        else console.log("Poster file deleted:", posterPath);
+      });
+    }
+
+    // Hapus relasi dengan Genre, Actor, dan Country
+    await movie.setGenres([]); // Menghapus relasi dengan genre
+    await movie.setActors([]); // Menghapus relasi dengan aktor
+    await movie.setCountries([]); // Menghapus relasi dengan negara
+
+    // Hapus movie dari database
+    await movie.destroy();
+
+    res.status(200).json({
+      success: true,
+      message: "Movie and associated relationships deleted successfully",
+    });
   } catch (error) {
-    console.error("Error deleting poster file:", error);
+    console.error("Error deleting movie:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to delete movie",
+    });
   }
 };

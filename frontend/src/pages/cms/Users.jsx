@@ -31,10 +31,10 @@ const Users = () => {
           status: user.isVerified ? "Active" : "Inactive",
         }));
         setUsers(usersWithStatus);
-        setLoading(false);
       } catch (err) {
         console.error("Error fetching users:", err);
         setError("Failed to load users");
+      } finally {
         setLoading(false);
       }
     };
@@ -45,8 +45,7 @@ const Users = () => {
     if (!window.confirm("Are you sure you want to delete this user?")) return;
     try {
       await axios.delete(`http://localhost:5000/api/users/${userId}`);
-      const response = await axios.get("http://localhost:5000/api/users");
-      setUsers(response.data.users);
+      setUsers(users.filter((user) => user.id !== userId));
       setError(null);
     } catch (error) {
       console.error("Error deleting user:", error);
@@ -74,6 +73,7 @@ const Users = () => {
             : user
         )
       );
+      setError(null);
     } catch (error) {
       console.error("Error updating user status:", error);
       setError("Failed to update user status");
@@ -92,6 +92,7 @@ const Users = () => {
         )
       );
       setRoleDropdownOpen(null);
+      setError(null);
     } catch (error) {
       console.error("Error updating user role:", error);
       setError("Failed to update user role");
@@ -111,20 +112,23 @@ const Users = () => {
 
   const handleAddUser = async () => {
     try {
-      await axios.post("http://localhost:5000/api/users", {
+      const response = await axios.post("http://localhost:5000/api/users", {
         name: newUser.username,
         email: newUser.email,
         password: newUser.password,
       });
-
-      const response = await axios.get("http://localhost:5000/api/users");
-      setUsers(response.data.users);
-
+      setUsers([...users, response.data.user]); // Add the new user to the list
       setNewUser({ username: "", email: "", password: "" });
       setError(null);
+      alert("User added successfully!");
     } catch (error) {
       console.error("Error adding user:", error);
-      setError("Failed to add user");
+      const errorMessage =
+        error.response && error.response.data && error.response.data.message
+          ? error.response.data.message
+          : "Failed to add user";
+      setError(errorMessage);
+      alert(errorMessage);
     }
   };
 
@@ -164,14 +168,24 @@ const Users = () => {
         password: editData.password || undefined,
       });
 
-      const response = await axios.get("http://localhost:5000/api/users");
-      setUsers(response.data.users);
-
-      window.alert("User updated successfully!");
+      setUsers((prevUsers) =>
+        prevUsers.map((user) =>
+          user.id === editData.id
+            ? { ...user, name: editData.username, email: editData.email }
+            : user
+        )
+      );
+      alert("User updated successfully!");
       closeEditModal();
+      setError(null); // Clear previous errors
     } catch (error) {
       console.error("Error updating user:", error);
-      setError("Failed to update user");
+
+      const errorMessage =
+        error.response && error.response.data && error.response.data.message
+          ? error.response.data.message
+          : "Failed to update user";
+      setError(errorMessage); // Display error without resetting form data
     }
   };
 
@@ -254,7 +268,115 @@ const Users = () => {
             {loading ? (
               <p>Loading...</p>
             ) : error ? (
-              <p className="tw-text-red-500">{error}</p>
+              <>
+              <div className="tw-overflow-x-auto">
+                <table className="tw-min-w-full tw-bg-white tw-border tw-border-gray-300">
+                  <thead>
+                    <tr className="tw-bg-gray-100">
+                      <th className="tw-py-2 tw-px-4 tw-border-b tw-border-gray-300 tw-text-left">
+                        #
+                      </th>
+                      <th className="tw-py-2 tw-px-4 tw-border-b tw-border-gray-300 tw-text-left">
+                        Username
+                      </th>
+                      <th className="tw-py-2 tw-px-4 tw-border-b tw-border-gray-300 tw-text-left">
+                        Email
+                      </th>
+                      <th className="tw-py-2 tw-px-4 tw-border-b tw-border-gray-300 tw-text-left">
+                        Status
+                      </th>
+                      <th className="tw-py-2 tw-px-4 tw-border-b tw-border-gray-300 tw-text-left">
+                        Role
+                      </th>
+                      <th className="tw-py-2 tw-px-4 tw-border-b tw-border-gray-300 tw-text-left">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {currentUsers.map((user, index) => (
+                      <tr
+                        key={user.id}
+                        className={
+                          index % 2 === 0 ? "tw-bg-white" : "tw-bg-gray-50"
+                        }
+                      >
+                        <td className="tw-py-2 tw-px-4 tw-border-b tw-border-gray-300">
+                          {index + 1 + (currentPage - 1) * itemsPerPage}
+                        </td>
+                        <td className="tw-py-2 tw-px-4 tw-border-b tw-border-gray-300">
+                          {user.name}
+                        </td>
+                        <td className="tw-py-2 tw-px-4 tw-border-b tw-border-gray-300">
+                          {user.email}
+                        </td>
+                        <td className="tw-py-2 tw-px-4 tw-border-b tw-border-gray-300">
+                          <button
+                            onClick={() => toggleStatus(user.id)}
+                            className={`tw-px-4 tw-py-1 tw-rounded-full tw-text-white ${
+                              user.isVerified
+                                ? "tw-bg-green-500"
+                                : "tw-bg-red-500"
+                            }`}
+                          >
+                            {user.isVerified ? "Active" : "Inactive"}
+                          </button>
+                        </td>
+                        <td className="tw-py-2 tw-px-4 tw-border-b tw-border-gray-300 relative">
+                          <button
+                            onClick={() =>
+                              setRoleDropdownOpen(
+                                roleDropdownOpen === user.id ? null : user.id
+                              )
+                            }
+                            className="tw-bg-blue-500 tw-text-white tw-px-4 tw-py-1 tw-rounded-full focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-blue-500"
+                          >
+                            {user.role || "User"}
+                          </button>
+                          {roleDropdownOpen === user.id && (
+                            <div className="tw-absolute tw-bg-white tw-border tw-rounded-lg tw-shadow-lg tw-mt-1 tw-z-10">
+                              <button
+                                onClick={() =>
+                                  handleRoleChange(user.id, "User")
+                                }
+                                className="tw-block tw-w-full tw-px-4 tw-py-2 tw-text-left hover:tw-bg-blue-100"
+                              >
+                                User
+                              </button>
+                              <button
+                                onClick={() =>
+                                  handleRoleChange(user.id, "Admin")
+                                }
+                                className="tw-block tw-w-full tw-px-4 tw-py-2 tw-text-left hover:tw-bg-blue-100"
+                              >
+                                Admin
+                              </button>
+                            </div>
+                          )}
+                        </td>
+                        <td className="tw-py-2 tw-px-4 tw-border-b tw-border-gray-300">
+                          <a
+                            href="#"
+                            className="tw-text-blue-600 hover:tw-underline tw-mr-2"
+                            onClick={() => openEditModal(user)}
+                          >
+                            Edit
+                          </a>
+                          <span className="tw-text-gray-500">|</span>
+                          <a
+                            href="#"
+                            className="tw-text-red-600 hover:tw-underline tw-ml-2"
+                            onClick={() => handleDeleteUser(user.id)}
+                          >
+                            Delete
+                          </a>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              </>
             ) : (
               <div className="tw-overflow-x-auto">
                 <table className="tw-min-w-full tw-bg-white tw-border tw-border-gray-300">
@@ -378,7 +500,9 @@ const Users = () => {
               </button>
               <button
                 onClick={handleNextPage}
-                disabled={currentPage === Math.ceil(filteredUsers.length / itemsPerPage)}
+                disabled={
+                  currentPage === Math.ceil(filteredUsers.length / itemsPerPage)
+                }
                 className="tw-relative tw-ml-3 tw-inline-flex tw-items-center tw-rounded-md tw-border tw-border-gray-300 tw-bg-white tw-px-4 tw-py-2 tw-text-sm tw-font-medium tw-text-gray-700 hover:tw-bg-gray-50"
               >
                 Next
@@ -386,9 +510,14 @@ const Users = () => {
             </div>
             <div className="tw-hidden sm:tw-flex sm:tw-flex-1 sm:tw-items-center sm:tw-justify-between">
               <p className="tw-text-sm tw-text-gray-700">
-                Showing {indexOfFirstUser + 1} to {Math.min(indexOfLastUser, filteredUsers.length)} of {filteredUsers.length} results
+                Showing {indexOfFirstUser + 1} to{" "}
+                {Math.min(indexOfLastUser, filteredUsers.length)} of{" "}
+                {filteredUsers.length} results
               </p>
-              <nav className="tw-isolate tw-inline-flex -tw-space-x-px tw-rounded-md tw-shadow-sm" aria-label="Pagination">
+              <nav
+                className="tw-isolate tw-inline-flex -tw-space-x-px tw-rounded-md tw-shadow-sm"
+                aria-label="Pagination"
+              >
                 <button
                   onClick={handlePreviousPage}
                   disabled={currentPage === 1}
@@ -396,22 +525,93 @@ const Users = () => {
                 >
                   Previous
                 </button>
-                {[...Array(Math.ceil(filteredUsers.length / itemsPerPage))].map((_, pageIndex) => (
+
+                {/* Conditional logic to show page numbers */}
+                {Math.ceil(filteredUsers.length / itemsPerPage) === 1 ? (
                   <button
-                    key={pageIndex}
-                    onClick={() => setCurrentPage(pageIndex + 1)}
-                    className={`tw-relative tw-inline-flex tw-items-center tw-px-4 tw-py-2 tw-text-sm tw-font-semibold ${
-                      pageIndex + 1 === currentPage
-                        ? "tw-bg-indigo-600 tw-text-white"
-                        : "tw-text-gray-900 tw-ring-1 tw-ring-inset tw-ring-gray-300 hover:tw-bg-gray-50"
-                    }`}
+                    onClick={() => setCurrentPage(1)}
+                    className="tw-relative tw-inline-flex tw-items-center tw-px-4 tw-py-2 tw-text-sm tw-font-semibold tw-bg-indigo-600 tw-text-white"
                   >
-                    {pageIndex + 1}
+                    1
                   </button>
-                ))}
+                ) : (
+                  <>
+                    {/* Always show first page */}
+                    <button
+                      onClick={() => setCurrentPage(1)}
+                      className={`tw-relative tw-inline-flex tw-items-center tw-px-4 tw-py-2 tw-text-sm tw-font-semibold ${
+                        currentPage === 1
+                          ? "tw-bg-indigo-600 tw-text-white"
+                          : "tw-text-gray-900 tw-ring-1 tw-ring-inset tw-ring-gray-300 hover:tw-bg-gray-50"
+                      }`}
+                    >
+                      1
+                    </button>
+
+                    {/* Ellipsis for pages beyond the first page */}
+                    {currentPage > 10 && (
+                      <span className="tw-relative tw-inline-flex tw-items-center tw-px-4 tw-py-2 tw-text-sm tw-font-semibold tw-text-gray-700">
+                        ...
+                      </span>
+                    )}
+
+                    {/* Dynamic pages around the current page */}
+                    {Array.from({ length: 10 }, (_, i) => {
+                      const page =
+                        currentPage <= 10
+                          ? i + 2
+                          : Math.floor((currentPage - 1) / 10) * 10 + i + 1;
+                      return (
+                        page < Math.ceil(filteredUsers.length / itemsPerPage) &&
+                        page > 1 && (
+                          <button
+                            key={page}
+                            onClick={() => setCurrentPage(page)}
+                            className={`tw-relative tw-inline-flex tw-items-center tw-px-4 tw-py-2 tw-text-sm tw-font-semibold ${
+                              page === currentPage
+                                ? "tw-bg-indigo-600 tw-text-white"
+                                : "tw-text-gray-900 tw-ring-1 tw-ring-inset tw-ring-gray-300 hover:tw-bg-gray-50"
+                            }`}
+                          >
+                            {page}
+                          </button>
+                        )
+                      );
+                    })}
+
+                    {/* Ellipsis for pages before the last page */}
+                    {currentPage <=
+                      Math.ceil(filteredUsers.length / itemsPerPage) - 10 && (
+                      <span className="tw-relative tw-inline-flex tw-items-center tw-px-4 tw-py-2 tw-text-sm tw-font-semibold tw-text-gray-700">
+                        ...
+                      </span>
+                    )}
+
+                    {/* Show last page if more than one page */}
+                    <button
+                      onClick={() =>
+                        setCurrentPage(
+                          Math.ceil(filteredUsers.length / itemsPerPage)
+                        )
+                      }
+                      className={`tw-relative tw-inline-flex tw-items-center tw-px-4 tw-py-2 tw-text-sm tw-font-semibold ${
+                        currentPage ===
+                        Math.ceil(filteredUsers.length / itemsPerPage)
+                          ? "tw-bg-indigo-600 tw-text-white"
+                          : "tw-text-gray-900 tw-ring-1 tw-ring-inset tw-ring-gray-300 hover:tw-bg-gray-50"
+                      }`}
+                    >
+                      {Math.ceil(filteredUsers.length / itemsPerPage)}
+                    </button>
+                  </>
+                )}
+
                 <button
                   onClick={handleNextPage}
-                  disabled={currentPage === Math.ceil(filteredUsers.length / itemsPerPage)}
+                  disabled={
+                    currentPage ===
+                    Math.ceil(filteredUsers.length / itemsPerPage)
+                  }
                   className="tw-relative tw-inline-flex tw-items-center tw-rounded-r-md tw-px-2 tw-py-2 tw-text-gray-400 tw-ring-1 tw-ring-inset tw-ring-gray-300 hover:tw-bg-gray-50"
                 >
                   Next
@@ -487,5 +687,3 @@ const Users = () => {
 };
 
 export default Users;
-
-

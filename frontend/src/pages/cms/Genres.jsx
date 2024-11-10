@@ -59,11 +59,15 @@ const Genres = () => {
     e.preventDefault();
 
     try {
-      await axios.put(`http://localhost:5000/api/genres/${editGenreId}`, { name: genreName });
+      await axios.put(`http://localhost:5000/api/genres/${editGenreId}`, {
+        name: genreName,
+      });
       setAllGenres(
-        allGenres.map((genre) =>
-          genre.id === editGenreId ? { ...genre, name: genreName } : genre
-        )
+        allGenres
+          .map((genre) =>
+            genre.id === editGenreId ? { ...genre, name: genreName } : genre
+          )
+          .sort((a, b) => a.name.localeCompare(b.name))
       );
       setGenreName("");
       setEditGenreId(null);
@@ -89,7 +93,10 @@ const Genres = () => {
 
   const indexOfLastGenre = currentPage * itemsPerPage;
   const indexOfFirstGenre = indexOfLastGenre - itemsPerPage;
-  const currentGenres = filteredGenres.slice(indexOfFirstGenre, indexOfLastGenre);
+  const currentGenres = filteredGenres.slice(
+    indexOfFirstGenre,
+    indexOfLastGenre
+  );
 
   const handlePreviousPage = () => {
     if (currentPage > 1) setCurrentPage(currentPage - 1);
@@ -140,7 +147,7 @@ const Genres = () => {
           </div>
 
           <div className="tw-mt-4">
-            <div className="tw-overflow-x-auto">
+            <div className="tw-overflow-x-auto tw-max-h-96 tw-overflow-y-auto">
               <table className="tw-min-w-full tw-bg-white tw-border tw-border-gray-300">
                 <thead>
                   <tr className="tw-bg-gray-100">
@@ -158,7 +165,12 @@ const Genres = () => {
                 <tbody>
                   {currentGenres.length > 0 ? (
                     currentGenres.map((genre, index) => (
-                      <tr key={genre.id} className={index % 2 === 0 ? "tw-bg-white" : "tw-bg-gray-50"}>
+                      <tr
+                        key={genre.id}
+                        className={
+                          index % 2 === 0 ? "tw-bg-white" : "tw-bg-gray-50"
+                        }
+                      >
                         <td className="tw-py-2 tw-px-4 tw-border-b tw-border-gray-300">
                           {indexOfFirstGenre + index + 1}
                         </td>
@@ -207,7 +219,10 @@ const Genres = () => {
                 </button>
                 <button
                   onClick={handleNextPage}
-                  disabled={currentPage === Math.ceil(filteredGenres.length / itemsPerPage)}
+                  disabled={
+                    currentPage ===
+                    Math.ceil(filteredGenres.length / itemsPerPage)
+                  }
                   className="tw-relative tw-ml-3 tw-inline-flex tw-items-center tw-rounded-md tw-border tw-border-gray-300 tw-bg-white tw-px-4 tw-py-2 tw-text-sm tw-font-medium tw-text-gray-700 hover:tw-bg-gray-50"
                 >
                   Next
@@ -215,29 +230,114 @@ const Genres = () => {
               </div>
               <div className="tw-hidden sm:tw-flex sm:tw-flex-1 sm:tw-items-center sm:tw-justify-between">
                 <p className="tw-text-sm tw-text-gray-700">
-                  Showing {indexOfFirstGenre + 1} to {Math.min(indexOfLastGenre, filteredGenres.length)} of {filteredGenres.length} results
+                  Showing {indexOfFirstGenre + 1} to{" "}
+                  {Math.min(indexOfLastGenre, filteredGenres.length)} of{" "}
+                  {filteredGenres.length} results
                 </p>
-                <nav className="tw-isolate tw-inline-flex -tw-space-x-px tw-rounded-md tw-shadow-sm" aria-label="Pagination">
+                <nav
+                  className="tw-isolate tw-inline-flex -tw-space-x-px tw-rounded-md tw-shadow-sm"
+                  aria-label="Pagination"
+                >
+                  {/* Previous Button */}
                   <button
                     onClick={handlePreviousPage}
-                    className="tw-relative tw-inline-flex tw-items-center tw-rounded-l-md tw-px-2 tw-py-2 tw-text-gray-400 tw-ring-1 tw-ring-inset tw-ring-gray-300 hover:tw-bg-gray-50 focus:tw-z-20"
+                    disabled={currentPage === 1}
+                    className="tw-relative tw-inline-flex tw-items-center tw-rounded-l-md tw-px-2 tw-py-2 tw-text-gray-400 tw-ring-1 tw-ring-inset tw-ring-gray-300 hover:tw-bg-gray-50"
                   >
                     Previous
                   </button>
-                  {[...Array(Math.ceil(filteredGenres.length / itemsPerPage))].map((_, pageIndex) => (
+
+                  {/* Single page or dynamic pagination */}
+                  {Math.ceil(filteredGenres.length / itemsPerPage) === 1 ? (
+                    // If only one page, show page 1 only
                     <button
-                      key={pageIndex}
-                      onClick={() => setCurrentPage(pageIndex + 1)}
-                      className={`tw-relative tw-inline-flex tw-items-center tw-px-4 tw-py-2 tw-text-sm tw-font-semibold ${
-                        pageIndex + 1 === currentPage ? "tw-bg-indigo-600 tw-text-white" : "tw-text-gray-900 tw-ring-1 tw-ring-inset tw-ring-gray-300 hover:tw-bg-gray-50"
-                      }`}
+                      onClick={() => setCurrentPage(1)}
+                      className="tw-relative tw-inline-flex tw-items-center tw-px-4 tw-py-2 tw-text-sm tw-font-semibold tw-bg-indigo-600 tw-text-white"
                     >
-                      {pageIndex + 1}
+                      1
                     </button>
-                  ))}
+                  ) : (
+                    <>
+                      {/* Always show the first page */}
+                      <button
+                        onClick={() => setCurrentPage(1)}
+                        className={`tw-relative tw-inline-flex tw-items-center tw-px-4 tw-py-2 tw-text-sm tw-font-semibold ${
+                          currentPage === 1
+                            ? "tw-bg-indigo-600 tw-text-white"
+                            : "tw-text-gray-900 tw-ring-1 tw-ring-inset tw-ring-gray-300 hover:tw-bg-gray-50"
+                        }`}
+                      >
+                        1
+                      </button>
+
+                      {/* Ellipsis for pages beyond the first set */}
+                      {currentPage > 10 && (
+                        <span className="tw-relative tw-inline-flex tw-items-center tw-px-4 tw-py-2 tw-text-sm tw-font-semibold tw-text-gray-700">
+                          ...
+                        </span>
+                      )}
+
+                      {/* Dynamic pages around the current page */}
+                      {Array.from({ length: 10 }, (_, i) => {
+                        const page =
+                          currentPage <= 10
+                            ? i + 2
+                            : Math.floor((currentPage - 1) / 10) * 10 + i + 1;
+                        return (
+                          page <
+                            Math.ceil(filteredGenres.length / itemsPerPage) &&
+                          page > 1 && (
+                            <button
+                              key={page}
+                              onClick={() => setCurrentPage(page)}
+                              className={`tw-relative tw-inline-flex tw-items-center tw-px-4 tw-py-2 tw-text-sm tw-font-semibold ${
+                                page === currentPage
+                                  ? "tw-bg-indigo-600 tw-text-white"
+                                  : "tw-text-gray-900 tw-ring-1 tw-ring-inset tw-ring-gray-300 hover:tw-bg-gray-50"
+                              }`}
+                            >
+                              {page}
+                            </button>
+                          )
+                        );
+                      })}
+
+                      {/* Ellipsis for pages before the last page */}
+                      {currentPage <=
+                        Math.ceil(filteredGenres.length / itemsPerPage) -
+                          10 && (
+                        <span className="tw-relative tw-inline-flex tw-items-center tw-px-4 tw-py-2 tw-text-sm tw-font-semibold tw-text-gray-700">
+                          ...
+                        </span>
+                      )}
+
+                      {/* Show last page if more than one page */}
+                      <button
+                        onClick={() =>
+                          setCurrentPage(
+                            Math.ceil(filteredGenres.length / itemsPerPage)
+                          )
+                        }
+                        className={`tw-relative tw-inline-flex tw-items-center tw-px-4 tw-py-2 tw-text-sm tw-font-semibold ${
+                          currentPage ===
+                          Math.ceil(filteredGenres.length / itemsPerPage)
+                            ? "tw-bg-indigo-600 tw-text-white"
+                            : "tw-text-gray-900 tw-ring-1 tw-ring-inset tw-ring-gray-300 hover:tw-bg-gray-50"
+                        }`}
+                      >
+                        {Math.ceil(filteredGenres.length / itemsPerPage)}
+                      </button>
+                    </>
+                  )}
+
+                  {/* Next Button */}
                   <button
                     onClick={handleNextPage}
-                    className="tw-relative tw-inline-flex tw-items-center tw-rounded-r-md tw-px-2 tw-py-2 tw-text-gray-400 tw-ring-1 tw-ring-inset tw-ring-gray-300 hover:tw-bg-gray-50 focus:tw-z-20"
+                    disabled={
+                      currentPage ===
+                      Math.ceil(filteredGenres.length / itemsPerPage)
+                    }
+                    className="tw-relative tw-inline-flex tw-items-center tw-rounded-r-md tw-px-2 tw-py-2 tw-text-gray-400 tw-ring-1 tw-ring-inset tw-ring-gray-300 hover:tw-bg-gray-50"
                   >
                     Next
                   </button>
@@ -252,4 +352,3 @@ const Genres = () => {
 };
 
 export default Genres;
-

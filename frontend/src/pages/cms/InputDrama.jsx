@@ -11,7 +11,6 @@ const InputDrama = () => {
   const [genresOptions, setGenresOptions] = useState([]);
   const [actorsOptions, setActorsOptions] = useState([]);
   const [title, setTitle] = useState("");
-  const [altTitle, setAltTitle] = useState("");
   const [synopsis, setSynopsis] = useState("");
   const [year, setYear] = useState("");
   const [trailer, setTrailer] = useState("");
@@ -20,10 +19,12 @@ const InputDrama = () => {
     const fetchCountries = async () => {
       try {
         const response = await axios.get("http://localhost:5000/api/countries");
-        const countryOptions = response.data.countries.map((country) => ({
-          value: country.id,
-          label: country.name,
-        }));
+        const countryOptions = response.data.countries
+          .map((country) => ({
+            value: country.id,
+            label: country.name,
+          }))
+          .sort((a, b) => a.label.localeCompare(b.label)); // Sort alphabetically by country name
         setCountries(countryOptions);
       } catch (error) {
         console.error("Error fetching countries:", error);
@@ -31,30 +32,37 @@ const InputDrama = () => {
     };
     fetchCountries();
   }, []);
+  
 
   useEffect(() => {
     const fetchGenres = async () => {
       try {
         const response = await axios.get("http://localhost:5000/api/genres");
-        setGenresOptions(response.data.genres || []);
+        const sortedGenres = (response.data.genres || []).sort((a, b) =>
+          a.name.localeCompare(b.name) // Sort genres A-Z by name
+        );
+        setGenresOptions(sortedGenres);
       } catch (error) {
         console.error("Error fetching genres:", error);
       }
     };
     fetchGenres();
   }, []);
+  
 
   useEffect(() => {
     const fetchActors = async () => {
       try {
         const response = await axios.get("http://localhost:5000/api/actors");
-        const actorOptions = response.data.actors.map((actor) => ({
-          value: actor.id,
-          label: actor.name,
-          photo: actor.profile_path.startsWith("uploads")
-            ? `http://localhost:5000/${actor.profile_path}`
-            : actor.profile_path,
-        }));
+        const actorOptions = response.data.actors
+          .map((actor) => ({
+            value: actor.id,
+            label: actor.name,
+            photo: actor.profile_path?.startsWith("uploads")
+              ? `http://localhost:5000/${actor.profile_path}`
+              : actor.profile_path,
+          }))
+          .sort((a, b) => a.label.localeCompare(b.label)); // Sort actors A-Z by name
         setActorsOptions(actorOptions);
       } catch (error) {
         console.error("Error fetching actors:", error);
@@ -62,6 +70,7 @@ const InputDrama = () => {
     };
     fetchActors();
   }, []);
+  
 
   const handleGenreChange = (genre) => {
     setSelectedGenres((prevGenres) =>
@@ -81,16 +90,22 @@ const InputDrama = () => {
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
-    if (file) {
+
+    if (file && file.type.startsWith("image/")) {
       setUploadedImage(file);
+    } else {
+      alert("Only image files are allowed.");
     }
   };
 
   const handleDrop = (e) => {
     e.preventDefault();
     const file = e.dataTransfer.files[0];
-    if (file) {
+
+    if (file && file.type.startsWith("image/")) {
       setUploadedImage(file);
+    } else {
+      alert("Only image files are allowed.");
     }
   };
 
@@ -104,7 +119,47 @@ const InputDrama = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
+    // Validasi input
+    if (!title) {
+      alert("Title is required.");
+      return;
+    }
+    if (!synopsis) {
+      alert("Synopsis is required.");
+      return;
+    }
+    if (!year) {
+      alert("Year is required.");
+      return;
+    } else if (!/^\d{4}$/.test(year)) {
+      alert("Year must be a 4-digit number.");
+      return;
+    }
+    if (!trailer) {
+      alert("Trailer URL is required.");
+      return;
+    } else if (!/^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/.test(trailer)) {
+      alert("Trailer must be a valid URL.");
+      return;
+    }
+    if (selectedCountries.length === 0) {
+      alert("At least one country must be selected.");
+      return;
+    }
+    if (selectedGenres.length === 0) {
+      alert("At least one genre must be selected.");
+      return;
+    }
+    if (selectedActors.length === 0) {
+      alert("At least one actor must be selected.");
+      return;
+    }
+    if (!uploadedImage) {
+      alert("A poster image is required.");
+      return;
+    }
+  
     const formData = new FormData();
     formData.append("title", title);
     formData.append("synopsis", synopsis);
@@ -119,11 +174,11 @@ const InputDrama = () => {
       "actors",
       JSON.stringify(selectedActors.map((actor) => actor.value))
     );
-
+  
     if (uploadedImage) {
       formData.append("poster", uploadedImage);
     }
-
+  
     try {
       const response = await axios.post(
         "http://localhost:5000/api/movies",
@@ -136,7 +191,7 @@ const InputDrama = () => {
       );
       console.log("Movie created:", response.data);
       alert("Movie created successfully!");
-
+  
       // Reset all fields after successful submit
       setTitle("");
       setSynopsis("");
@@ -146,13 +201,13 @@ const InputDrama = () => {
       setSelectedGenres([]);
       setSelectedActors([]);
       setUploadedImage(null);
-
+  
       console.log("Form fields reset to default values.");
     } catch (error) {
       console.error("Error creating movie:", error);
       alert("Failed to create movie");
     }
-  };
+  };  
 
   // Custom styles for react-select
   const customStyles = {
@@ -167,10 +222,28 @@ const InputDrama = () => {
     }),
     menu: (provided) => ({
       ...provided,
-      maxHeight: 200,
+      maxHeight: "200px", // Restrict the height of the dropdown menu
+      overflowY: "auto", // Allow scrolling only within the dropdown menu
+    }),
+    menuList: (provided) => ({
+      ...provided,
+      maxHeight: "200px", // Limit the height of items to prevent overflow
+      padding: 0,
       overflowY: "auto",
+      "&::-webkit-scrollbar": {
+        width: "8px",
+        height: "8px",
+      },
+      "&::-webkit-scrollbar-thumb": {
+        backgroundColor: "#b3b3b3",
+        borderRadius: "4px",
+      },
+      "&::-webkit-scrollbar-thumb:hover": {
+        backgroundColor: "#999",
+      },
     }),
   };
+  
 
   return (
     <div className="tw-px-4 tw-flex tw-flex-col tw-justify-start tw-items-center tw-bg-gray-100 tw-min-h-screen tw-w-full">
@@ -213,6 +286,7 @@ const InputDrama = () => {
                         type="file"
                         name="file_upload"
                         className="tw-hidden"
+                        accept="image/*"
                         onChange={handleImageUpload}
                       />
                     </label>
