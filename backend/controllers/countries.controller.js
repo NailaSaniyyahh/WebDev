@@ -1,5 +1,8 @@
 import Country from "../models/countries.model.js"; // Import the Country model
 
+// Utility function to validate country name
+const isValidCountryName = (name) => /^[a-zA-Z\s]+$/.test(name); // Allows letters and spaces only
+
 // Create a new country
 export const createCountry = async (req, res) => {
   let { name } = req.body;
@@ -7,6 +10,9 @@ export const createCountry = async (req, res) => {
   try {
     if (!name) {
       return res.status(400).json({ success: false, message: "Country name is required" });
+    }
+    if (!isValidCountryName(name)) {
+      return res.status(400).json({ success: false, message: "Country name must contain only letters and cannot include numbers or special characters" });
     }
 
     // Capitalize the first letter and convert the rest to lowercase
@@ -31,7 +37,6 @@ export const createCountry = async (req, res) => {
   }
 };
 
-
 // GET /api/countries
 export const getCountries = async (req, res) => {
   const { page = 1, limit = 25 } = req.query;
@@ -41,7 +46,7 @@ export const getCountries = async (req, res) => {
     const countries = await Country.findAll({
       limit: parseInt(limit),
       offset: parseInt(offset),
-      order: [['name', 'ASC']], // Mengurutkan berdasarkan kolom 'name' secara ascending
+      order: [['name', 'ASC']], // Sort alphabetically
     });
     res.status(200).json({ countries });
   } catch (error) {
@@ -50,14 +55,13 @@ export const getCountries = async (req, res) => {
   }
 };
 
-
 // DELETE /api/countries/:id
 export const deleteCountry = async (req, res) => {
   const { id } = req.params;
 
   try {
     // Check if the country exists
-    const country = await Country.findByPk(id); // Using Sequelize to find by primary key (id)
+    const country = await Country.findByPk(id);
     if (!country) {
       return res.status(404).json({ success: false, message: "Country not found" });
     }
@@ -75,7 +79,6 @@ export const deleteCountry = async (req, res) => {
   }
 };
 
-
 // UPDATE /api/countries/:id
 export const updateCountry = async (req, res) => {
   const { id } = req.params;
@@ -84,6 +87,9 @@ export const updateCountry = async (req, res) => {
   try {
     if (!name) {
       return res.status(400).json({ success: false, message: "Country name is required" });
+    }
+    if (!isValidCountryName(name)) {
+      return res.status(400).json({ success: false, message: "Country name must contain only letters and cannot include numbers or special characters" });
     }
 
     // Capitalize the first letter and convert the rest to lowercase

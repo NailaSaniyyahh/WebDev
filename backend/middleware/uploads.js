@@ -4,7 +4,7 @@ import fs from "fs";
 
 // Middleware untuk mengatur path upload secara dinamis
 export const setUploadPath = (folderPath) => {
-  const dynamicUploadPath = path.resolve(`uploads/${folderPath}`);
+  const dynamicUploadPath = path.resolve(`backend/uploads/${folderPath}`);
   
   // Pastikan folder tujuan ada
   if (!fs.existsSync(dynamicUploadPath)) {

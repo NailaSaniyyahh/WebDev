@@ -6,10 +6,10 @@ export const getActors = async (req, res) => {
     // Get the total count of actors first
     const totalActors = await Actor.count();
 
-    // Fetch the latest 10 actors
+    // Fetch the latest 100 actors based on id in descending order
     const actors = await Actor.findAll({
-      limit: 10,
-      order: [["id", "DESC"]], // Order by ID in descending order
+      limit: 100,
+      order: [["id", "DESC"]], // Order by ID in descending order to get the most recent entries
     });
 
     res.status(200).json({
