@@ -11,6 +11,7 @@ import {
     getDistinctStatuses,
 } from '../../controllers/landing-page/movieController.js'; // Gunakan ESM
 
+
 const router = express.Router();
 
 // Get all movies

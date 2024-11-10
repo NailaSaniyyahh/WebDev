@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Container, Row, Col, Form, Button } from 'react-bootstrap'; 
+import "slick-carousel/slick/slick.css"; 
+import "slick-carousel/slick/slick-theme.css";
 import { useParams, useNavigate } from 'react-router-dom'; // Import useNavigate for redirection
 import AllActor from './AllActor'; 
 import Footer from "./footer/Footer.jsx";
@@ -94,9 +96,11 @@ const DetailPage = () => {
     }, [id]);
 
     const getEmbedUrl = (url) => {
-        const videoId = url.split('v=')[1]; 
-        return `https://www.youtube.com/embed/${videoId}`; 
+        const regex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+        const match = url.match(regex);
+        return match ? `https://www.youtube.com/embed/${match[1]}` : null;
     };
+    
       
     if (!movie) {
         return <h2>Loading...</h2>; 
@@ -110,7 +114,9 @@ const DetailPage = () => {
                 <Row className="d-flex flex-wrap align-items-start">
                     <Col xs={7} sm={6} md={4} className="d-flex justify-content-center align-items-start mt-5">
                         <img
-                            src={movie.poster} 
+                            src={movie.poster.startsWith("uploads")
+                                ? `http://localhost:5000/${movie.poster}`
+                                : movie.poster} 
                             style={{ width: '300px', borderRadius: '10px', boxShadow: '0 4px 8px rgba(0,0,0,0.2)' }}
                             alt="Movie Poster"
                         />
