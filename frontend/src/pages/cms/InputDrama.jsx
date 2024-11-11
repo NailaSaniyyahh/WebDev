@@ -309,12 +309,12 @@ const InputDrama = () => {
                   )}
                 </div>
 
-                <button
+                {/* <button
                   type="submit"
                   className="tw-inline-flex tw-items-center tw-justify-center tw-rounded-xl tw-bg-green-600 tw-py-2 tw-px-6 tw-font-dm tw-text-base tw-font-medium tw-text-white tw-shadow-xl tw-shadow-green-100/75 tw-transition-transform tw-duration-200 tw-ease-in-out hover:tw-scale-[1.02] tw-mt-2"
                 >
                   Submit
-                </button>
+                </button> */}
               </div>
 
               {/* Right Column: Input Fields */}
@@ -434,6 +434,15 @@ const InputDrama = () => {
                     onChange={(e) => setTrailer(e.target.value)}
                     className="tw-w-full tw-border tw-border-gray-300 tw-rounded-lg tw-p-2 focus:tw-outline-0 focus:tw-ring-2 focus:tw-ring-gray-300"
                   />
+                </div>
+                {/* Submit Button at Bottom Right */}
+                <div className="tw-flex tw-justify-end tw-mt-4">
+                  <button
+                    type="submit"
+                    className="tw-inline-flex tw-items-center tw-justify-center tw-rounded-xl tw-bg-green-600 tw-py-2 tw-px-6 tw-font-dm tw-text-base tw-font-medium tw-text-white tw-shadow-xl tw-shadow-green-100/75 tw-transition-transform tw-duration-200 tw-ease-in-out hover:tw-scale-[1.02]"
+                  >
+                    Submit
+                  </button>
                 </div>
               </div>
             </div>
