@@ -1,18 +1,22 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../db/connectDB.js";
 import Movie from "./movies.model.js";
-import Country from "./countries.model.js";
 
 // Define Review model
 const Review = sequelize.define(
   "Review",
   {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
     movie_id: {
       type: DataTypes.INTEGER,
       allowNull: true,
       references: {
-        model: Movie,
-        key: "id",
+        model: Movie, // Referensi ke model Movie
+        key: "id",    // Menghubungkan ke kolom id pada tabel movies
       },
       onUpdate: "CASCADE",
       onDelete: "SET NULL",
@@ -31,15 +35,20 @@ const Review = sequelize.define(
     },
   },
   {
-    timestamps: true, // Adds createdAt and updatedAt fields
-    tableName: "reviews",
+    timestamps: false, // Menambahkan kolom createdAt dan updatedAt
   }
 );
 
-// Define associations
-Review.belongsTo(Movie, { foreignKey: "movie_id", as: "movie" });
-Movie.hasMany(Review, { foreignKey: "movie_id", as: "reviews" });
-
+// Membuat asosiasi antara Review dan Movie
+Movie.hasMany(Review, {
+  foreignKey: "movie_id",
+  as: "reviews",
+});
+Review.belongsTo(Movie, {
+  foreignKey: "movie_id",
+  as: "movie",
+});
 
 export default Review;
+
 

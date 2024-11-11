@@ -218,7 +218,7 @@ const Actors = () => {
             />
           </div>
 
-          <div className="tw-overflow-x-auto tw-max-h-96 tw-overflow-y-auto">
+          <div className="tw-mt-4 tw-overflow-x-auto tw-max-h-96 tw-overflow-y-auto">
             <table className="tw-min-w-full tw-bg-white tw-border tw-border-gray-300">
               <thead>
                 <tr className="tw-bg-gray-100">
