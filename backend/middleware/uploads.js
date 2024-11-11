@@ -4,18 +4,19 @@ import fs from "fs";
 
 // Middleware untuk mengatur path upload secara dinamis
 export const setUploadPath = (folderPath) => {
-  const dynamicUploadPath = path.resolve(`backend/uploads/${folderPath}`);
+  const dynamicUploadPath = path.resolve(`uploads/${folderPath}`);
   
-  // Pastikan folder tujuan ada
   if (!fs.existsSync(dynamicUploadPath)) {
     fs.mkdirSync(dynamicUploadPath, { recursive: true });
   }
-  
+
   return (req, res, next) => {
-    req.uploadPath = dynamicUploadPath; // Menyimpan path ke request object
+    req.uploadPath = dynamicUploadPath; 
+    console.log("Upload path set to:", req.uploadPath); // Debugging log
     next();
   };
 };
+
 
 // Konfigurasi multer dengan penyimpanan dinamis
 const storage = multer.diskStorage({

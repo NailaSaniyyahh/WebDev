@@ -1,5 +1,6 @@
 import sequelize from '../../db/connectDB.js'; // ESM Import
 import { isAuthenticated } from '../../middleware/authMiddleware.js';
+import { updateMovieRating } from './movieController.js';
 
 // Fetch all reviews
 export const getReview = async (req, res) => {
@@ -15,25 +16,23 @@ export const getReview = async (req, res) => {
 export const addReview = async (req, res) => {
   const { movieId, user, rating, text } = req.body;
 
-  // Logging untuk memastikan data yang diterima
-  console.log("Data diterima:", { movieId, user, rating, text });
-
   // Validasi input
   if (!movieId || !user || !rating || !text) {
-      console.log("Validasi gagal: data tidak lengkap");
-      return res.status(400).json({ error: 'All fields are required' });
+    return res.status(400).json({ error: 'All fields are required' });
   }
 
   const sql = `INSERT INTO reviews (movie_id, author, rating, content) VALUES (?, ?, ?, ?)`;
 
   try {
-      await sequelize.query(sql, {
-          replacements: [movieId, user, rating, text],
-      });
-      console.log("Review berhasil ditambahkan ke database");
-      res.status(201).json({ message: 'Review added successfully' });
+    // Tambahkan review baru ke database
+    await sequelize.query(sql, { replacements: [movieId, user, rating, text] });
+
+    // Panggil fungsi untuk memperbarui rating film
+    const avgRating = await updateMovieRating(movieId);
+
+    res.status(201).json({ message: 'Review added successfully', averageRating: avgRating });
   } catch (error) {
-      console.error('Error in addReview:', error); // Cetak error di server
-      res.status(500).json({ error: error.message });
+    console.error('Error in addReview:', error);
+    res.status(500).json({ error: error.message });
   }
 };

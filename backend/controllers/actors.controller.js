@@ -25,6 +25,7 @@ export const getActors = async (req, res) => {
 
 
 export const addActor = async (req, res) => {
+  console.log("File received:", req.file); // Debugging log
   const { name } = req.body;
   const profile_path = req.file ? `uploads/actors/${req.file.filename}` : null;
 

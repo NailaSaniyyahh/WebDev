@@ -33,6 +33,7 @@ const SearchBar = () => {
         value={searchQuery}
         onChange={handleSearch}
         placeholder="Search Movies..."
+        className='landing-page'
       />
       {searchQuery && filteredMovies.length > 0 && (
         <div className="search-results">

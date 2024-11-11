@@ -32,7 +32,7 @@ const Sidebar = () => {
     { id: 2, path: "/cms/countries", name: "Countries", icon: FaLandmark, visibleTo: "Admin" },
     { id: 3, path: "/cms/genres", name: "Genres", icon: GiDramaMasks, visibleTo: "Admin" },
     { id: 4, path: "/cms/actors", name: "Actors", icon: HiUserGroup, visibleTo: "Admin" },
-    { id: 5, path: "/cms/comments", name: "Comments", icon: FaComments, visibleTo: "Admin" },
+    { id: 5, path: "/cms/reviews", name: "Reviews", icon: FaComments, visibleTo: "Admin" },
     { id: 6, path: "/cms/users", name: "Users", icon: FaUser, visibleTo: "Admin" },
   ];
 

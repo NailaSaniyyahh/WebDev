@@ -15,8 +15,9 @@ const AllActor = ({ actors = [] }) => { // Default value untuk actors adalah arr
     dots: true,
     infinite: true,
     speed: 500,
-    slidesToShow: 5, // Untuk desktop
+    slidesToShow: actors.length < 1 ? actors.length : 3, // Untuk desktop
     slidesToScroll: 1,
+    autoplay: false,
     nextArrow: <NextArrow />,
     prevArrow: <PrevArrow />,
     responsive: [

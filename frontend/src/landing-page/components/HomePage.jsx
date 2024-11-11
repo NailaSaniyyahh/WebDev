@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from 'react-router-dom';
 import "../../style/Home.css";
+import "../../style/landingpage.css";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css"; 
 import "slick-carousel/slick/slick-theme.css";
 import { FaArrowLeft, FaArrowRight, FaPlay } from "react-icons/fa";
 import MovieCard from "./MovieCard";
 import Footer from "./footer/Footer.jsx";
+import NavigationBar from "./NavigationBar.jsx";
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const HomePage = () => {
   const [videoUrl, setVideoUrl] = useState("");
@@ -111,6 +114,8 @@ const HomePage = () => {
   }, []);
   
   return (
+    <>
+    <NavigationBar />
     <div className="slider-area bg-black">
       <div className="md:container mx-auto p-0">
         <Slider {...settings}>
@@ -139,10 +144,10 @@ const HomePage = () => {
                       {movie.rating || "Rating not available"}
                     </div>
                     <button 
-                      className=
-                      "bg-green-500 text-white py-2 px-4 rounded shadow-lg hover:bg-green-600 transition-all duration-300 flex items-center justify-center" 
-                      onClick={() => handlePlay(movie.trailer)}>
-                      <FaPlay className="mr-2"/> Play
+                        className="play-button"
+                        onClick={() => handlePlay(movie.trailer)}
+                    >
+                        <FaPlay className="mr-2" /> Play
                     </button>
                   </div>
                 </div>
@@ -155,21 +160,16 @@ const HomePage = () => {
 
         {/* Modal untuk menampilkan video trailer */}
         {show && (
-            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50">
-                <div className="bg-gray-800 rounded-lg overflow-hidden max-w-4xl w-full"> {/* Lebar maksimum modal */}
+            <div className="modal-overlay" onClick={handleClose}>
+                <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                    <button className="close-button" onClick={handleClose}>Close</button>
                     <iframe
-                        className="w-full h-96" // Menggunakan kelas Tailwind untuk lebar penuh dan tinggi 24rem (400px)
                         src={videoUrl}
                         title="YouTube video player"
                         frameBorder="0"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowFullScreen
                     ></iframe>
-                    <div className="p-4">
-                        <button className="bg-gray-500 text-white py-2 px-4 rounded" onClick={handleClose}>
-                            Close
-                        </button>
-                    </div>
                 </div>
             </div>
         )}
@@ -195,6 +195,7 @@ const HomePage = () => {
         <Footer/>
       </div>
     </div>
+    </>
   );
 };
 

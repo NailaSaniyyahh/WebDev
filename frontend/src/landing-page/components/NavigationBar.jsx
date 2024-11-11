@@ -1,11 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { Navbar, Container, Nav, Image, Form } from "react-bootstrap";
-import { FaSearch, FaBell } from "react-icons/fa"; // Import necessary icons
+import { Navbar, Container, Nav, Image, Form, Button } from "react-bootstrap";
+import { FaSearch, FaBell, FaSignOutAlt } from "react-icons/fa";
 import logo from "../../assets/logofixx.png";
 import { useNavigate } from "react-router-dom";
 import DropDownProfile from "./DropDownProfile";
+import 'bootstrap/dist/css/bootstrap.min.css';
+import "../../style/landingpage.css";
+import "../../style/navbar.css";
+import { useAuthStore } from "../../store/authStore";
 
 const NavigationBar = () => {
+  const { isAuthenticated, user, logout } = useAuthStore(); // Ambil status login dan data user dari authStore
+
+  const handleLogout = () => {
+    logout();
+  };
+
   const [isSticky, setSticky] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -18,10 +28,9 @@ const NavigationBar = () => {
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     if (searchQuery) {
-      navigate(`/search?query=${searchQuery}`); // Pastikan searchQuery dikirim
+      navigate(`/search?query=${searchQuery}`);
     }
   };
-  
 
   useEffect(() => {
     const handleScroll = () => {
@@ -55,12 +64,14 @@ const NavigationBar = () => {
             <li><a href="/all-movies?category=popular">Popular</a></li>
             <li><a href="/all-movies?category=top_rated">Top Rating</a></li>
             <li><a href="/all-movies?category=upcoming">Upcoming</a></li>
+            {isAuthenticated && (
+              <li><a href="/cms/input-drama">Input Drama</a></li>
+            )}
           </ul>
         </Nav>
-        
-        <Nav className="navbar-right">
-          <FaSearch className="icons" onClick={toggleSearchBar} style={{ cursor: 'pointer' }} />
 
+        <Nav className="navbar-right">
+          <FaSearch className="icons" onClick={toggleSearchBar} />
           {showSearch && (
             <Form onSubmit={handleSearchSubmit} className="search-bar">
               <Form.Control
@@ -72,7 +83,23 @@ const NavigationBar = () => {
             </Form>
           )}
 
-          <DropDownProfile />
+          {isAuthenticated ? (
+            <>
+              <span className="user-info">
+                {user?.name} 
+              </span>
+              <Button
+                variant="outline-light"
+                onClick={handleLogout}
+                className="btn-logout"
+              >
+                <FaSignOutAlt className="mr-1" />
+                Logout
+              </Button>
+            </>
+          ) : (
+            <DropDownProfile />
+          )}
         </Nav>
       </Container>
     </Navbar>

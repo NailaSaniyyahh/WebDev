@@ -139,10 +139,11 @@ const InputDrama = () => {
     if (!trailer) {
       alert("Trailer URL is required.");
       return;
-    } else if (!/^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/.test(trailer)) {
+    } else if (!/^(https?:\/\/)?([\da-z.-]+\.[a-z.]{2,6})([\/\w .-]*)*(\?.*)?$/.test(trailer)) {
       alert("Trailer must be a valid URL.");
       return;
     }
+    
     if (selectedCountries.length === 0) {
       alert("At least one country must be selected.");
       return;

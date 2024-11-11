@@ -14,7 +14,7 @@ import InputDrama from "./pages/cms/InputDrama";
 import Countries from "./pages/cms/Countries";
 import Genres from "./pages/cms/Genres";
 import Actors from "./pages/cms/Actors";
-import Comments from "./pages/cms/Comments";
+import Reviews from "./pages/cms/Reviews";
 import Users from "./pages/cms/Users";
 //import "./App.css"
 
@@ -151,11 +151,11 @@ function App() {
             }
           />
           <Route
-            path="comments"
+            path="reviews"
             element={
               <ProtectedRoute>
                 {/* Restricted to Admin only */}
-                <Comments />
+                <Reviews />
               </ProtectedRoute>
             }
           />

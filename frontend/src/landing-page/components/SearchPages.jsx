@@ -4,6 +4,8 @@ import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from 'react';
 import Footer from "./footer/Footer";
 import "../../style/searchPage.css";
+import "../../style/landingpage.css";
+import NavigationBar from './NavigationBar';
 
 const SearchPages = () => {
   const location = useLocation(); 
@@ -74,6 +76,7 @@ const SearchPages = () => {
     setSelected(prev => prev.includes(value) ? prev.filter(item => item !== value) : [...prev, value]);
   };
   
+  
   // Memanggil fetchMovies saat query atau filter diubah
   useEffect(() => {
     if (query || selectedGenres.length > 0 || selectedCountries.length > 0 || selectedYears.length > 0 || selectedStatuses.length > 0) {
@@ -98,6 +101,8 @@ const SearchPages = () => {
   const limitedMovies = Array.isArray(movies) ? movies.slice(0, 100) : [];
 
   return (
+  <>
+  <NavigationBar/>
     <section className="trending p-40 mySearch" style={{ paddingTop: '120px' }}>
       <div className="container-fluid">
         <Row>
@@ -207,7 +212,9 @@ const SearchPages = () => {
               {limitedMovies.length > 0 ? limitedMovies.map((movie, index) => (
                 <Col key={index} xs={4} sm={4} md={5} lg={4} xl={2} className="text-center">
                   <Link to={`/detail/${movie.id}`}>
-                    <Image src={movie.poster} alt={movie.title} className="br-12" />
+                    <Image src={movie.poster.startsWith("uploads")
+                                        ? `http://localhost:5000/${movie.poster}`
+                                        : movie.poster} alt={movie.title} className="br-12" />
                     <h5>{movie.title}</h5>
                   </Link>
                 </Col>
@@ -218,6 +225,7 @@ const SearchPages = () => {
         <Footer />
       </div>
     </section>
+  </>
   );
 }
 
