@@ -70,6 +70,9 @@ Jika Anda ingin menjalankan proyek ini di komputer Anda, ikuti langkah-langkah b
 16. Untuk registrasi, hanya bisa menggunakan email yang tertera di nomor 15 karena akses terbatas.
 17. **Selesai**.
 
+## Jika ingin melihat lebih jelasnya bisa klik link tutorial di bawah ini:
+https://youtu.be/YgYbiHptUYw
+
 ## Penutupan
 
 Jika Anda mengalami kesulitan atau masalah dalam menjalankan proyek ini, pastikan Anda mengikuti semua langkah dengan benar. Jika masih ada kendala, Anda dapat membuka **Issue** di repositori ini untuk mendapatkan bantuan lebih lanjut.
