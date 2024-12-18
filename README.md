@@ -1,107 +1,75 @@
 
-# Project Setup and Installation Guide
+# THE FILM PROYEK
 
-Follow the steps below to set up and run the project on your local machine.
+Proyek ini dibuat untuk memenuhi tugas mata kuliah Pengembangan Web, dengan tujuan untuk membuat sebuah aplikasi database film yang berfungsi sebagai platform penyedia informasi tentang film-film dari berbagai negara dan berbagai genre. Aplikasi ini menyediakan berbagai informasi terkait film, memungkinkan pengguna untuk mencari, melihat detail film, menambahkan ulasan, dan memberikan rating terhadap film. Aplikasi ini sangat dibutuhkan bagi penggemar film yang ingin mendapatkan informasi akurat dan terkini tentang film favorit mereka, layaknya platform IMDb.
 
-## Steps to Set Up the Project
+## Langkah-langkah untuk melakukan proyek di komputer anda:
+Jika Anda ingin menjalankan proyek ini di komputer Anda, ikuti langkah-langkah berikut:
 
-### 1. Open Git Bash
-Launch Git Bash or any terminal you prefer.
+1. Buka **Git Bash** di komputer Anda.
+2. Arahkan ke GitHub ini dan salin repositori.
+3. Ketik perintah berikut untuk meng-clone repositori:
+   ```bash
+   git clone https://github.com/FarrelKeizaMuhammadYaminPutra/WebDev.git
+   ```
+4. Masuk ke dalam folder proyek yang telah di-clone:
+   ```bash
+   cd Webdev
+   ```
+5. Buka proyek menggunakan Visual Studio Code:
+   ```bash
+   code .
+   ```
+6. Buat file `.env` di root folder dengan isi sebagai berikut:
+   ```env
+   PORT=5000
+   JWT_SECRET=mysecretkey
+   NODE_ENV=development
+   MAILTRAP_TOKEN=de869588cb715776ed3b1fd242230c4a
+   MAILTRAP_ENDPOINT=https://send.api.mailtrap.io/
+   CLIENT_URL=http://localhost:5173
 
-### 2. Navigate to GitHub Repository
-Go to the GitHub repository for this project.
+   DB_HOST=localhost
+   DB_PORT=2306
+   DB_USER=root
+   DB_PASS=root
+   DB_NAME=thefilm
+   ```
+7. Buka terminal, kemudian ketik perintah berikut untuk masuk ke folder frontend:
+   ```bash
+   cd frontend
+   ```
+8. Buat file `.env` dan `.env.production` dengan isi sebagai berikut:
 
-### 3. Copy the Repository URL
-Copy the URL of the repository from GitHub.
+   **File `.env`:**
+   ```env
+   VITE_API_URL=http://localhost:5000
+   ```
 
-### 4. Clone the Repository
-In Git Bash, run the following command to clone the repository:
-```
-git clone <repository_url>
-```
+   **File `.env.production`:**
+   ```env
+   VITE_API_URL=http://localhost:5000
+   ```
+9. Kembali ke folder root dengan mengetik perintah berikut:
+   ```bash
+   cd ..
+   ```
+10. Buka **Docker** di komputer Anda.
+11. Ketik perintah berikut di terminal untuk menjalankan Docker Compose:
+    ```bash
+    docker compose up -d
+    ```
+12. Setelah proses build selesai, cek container yang berjalan.
+13. Klik link localhost yang muncul di terminal untuk membuka aplikasi.
+14. Untuk login sebagai **user**, gunakan email dan password berikut:
+    - **Email:** nailasaniyyah81@gmail.com
+    - **Password:** Nailanai30
+15. Untuk login sebagai **admin** (agar bisa mengakses CMS), gunakan email dan password berikut:
+    - **Email:** enderisgod69@gmail.com
+    - **Password:** Farrel123!
+16. Untuk registrasi, hanya bisa menggunakan email yang tertera di nomor 15 karena akses terbatas.
+17. **Selesai**.
 
-### 5. Navigate to the Project Folder
-Navigate into the project folder by running:
-```
-cd <folder_name>
-```
+## Penutupan
 
-### 6. Open the Project in VS Code
-Open the project in VS Code using the following command:
-```
-code .
-```
-
-### 7. Create a `.env` File in the Root Directory
-In the root folder, create a `.env` file with the following contents:
-
-```
-PORT=5000
-JWT_SECRET=mysecretkey
-NODE_ENV=development
-MAILTRAP_TOKEN=de869588cb715776ed3b1fd242230c4a
-MAILTRAP_ENDPOINT=https://send.api.mailtrap.io/
-CLIENT_URL=http://localhost:5173
-
-DB_HOST=localhost
-DB_PORT=2306
-DB_USER=root
-DB_PASS=root
-DB_NAME=thefilm
-```
-
-### 8. Navigate to the Frontend Folder
-In the terminal, type the following command to enter the frontend directory:
-```
-cd frontend
-```
-
-### 9. Create `.env` and `.env.production` Files in the Frontend Folder
-Create two environment files:
-
-#### `.env`
-```
-VITE_API_URL=http://localhost:5000
-```
-
-#### `.env.production`
-```
-VITE_API_URL=http://localhost:5000
-```
-
-### 10. Return to the Root Directory
-After creating the environment files, return to the root directory by typing:
-```
-cd ..
-```
-
-### 11. Open Docker
-Launch Docker on your system.
-
-### 12. Build and Start Containers
-Run the following command to start the containers:
-```
-docker compose up -d
-```
-
-### 13. Verify Containers are Running
-Check that the containers are successfully running.
-
-### 14. Access the Localhost Link
-After the build is complete, access the application by opening the localhost link in your browser.
-
-### 15. Login as User
-Use the following credentials to log in as a user:
-- Email: nailasaniyyah81@gmail.com
-- Password: Nailanai30
-
-### 16. Login as Admin (to Access CMS)
-Use the following credentials to log in as an admin:
-- Email: enderisgod69@gmail.com
-- Password: Farrel123!
-
-### 17. Registration Restrictions
-Note: Registrations can only be done using the email from step 16 (admin credentials) due to restricted access.
-
-### 18. End
-You are all set! Now, you can begin using the project.
+Jika Anda mengalami kesulitan atau masalah dalam menjalankan proyek ini, pastikan Anda mengikuti semua langkah dengan benar. Jika masih ada kendala, Anda dapat membuka **Issue** di repositori ini untuk mendapatkan bantuan lebih lanjut.
