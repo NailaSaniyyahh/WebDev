@@ -61,9 +61,6 @@ Jika Anda ingin menjalankan proyek ini di komputer Anda, ikuti langkah-langkah b
     ```
 12. Setelah proses build selesai, cek container yang berjalan.
 13. Klik link localhost yang muncul di terminal untuk membuka aplikasi.
-14. Untuk login sebagai **user**, gunakan email dan password berikut:
-    - **Email:** nailasaniyyah81@gmail.com
-    - **Password:** Nailanai30
 15. Untuk login sebagai **admin** (agar bisa mengakses CMS), gunakan email dan password berikut:
     - **Email:** enderisgod69@gmail.com
     - **Password:** Farrel123!
